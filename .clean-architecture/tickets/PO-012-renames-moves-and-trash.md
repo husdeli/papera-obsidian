@@ -26,7 +26,7 @@ unit alive in Papera after the user deleted the note.
 - [ ] Case (b) — a note moves out of the reserved root: the plugin drops it from `.papera-index.json` and deletes nothing in Papera.
 - [ ] Case (c) — a note is renamed into `.trash/`: the plugin treats it as a delete, not as case (b).
 - [ ] A note moved back into a project folder with its `papera_id` intact is adopted again, and is not created twice.
-- [ ] A folder rename by the user inside the reserved root does not rename the project in Papera, or the behaviour is documented if it does.
+- [ ] A folder rename by the user inside the reserved root behaves as `prd.md` section 8 decides, under "What happens when a person renames a project folder by hand?".
 - [ ] Every case above is written into `.clean-architecture/design.md`.
 
 ## Implementation Steps

@@ -57,7 +57,7 @@ tests are the acceptance gate, not an addition to it.
 - **Round-trip stability is a hard requirement.** A translation that does not return the original makes a note change on every sync with nobody editing it. Papera then records an endless run of revisions.
 - **No rule is invented here.** PO-005 owns the rules. This ticket owns the code and the proof.
 - **Links are held by identity, not by title.** A Papera link addresses a content unit by its identity, and that identity does not change when the title changes. Renaming one note therefore changes no data in any other note.
-- **Obsidian respells its own wikilinks.** A wikilink must name a path, because Obsidian has no link-by-identity form. When a title changes, the plugin renames the file through Obsidian's file-rename path, and Obsidian updates every inbound wikilink itself. The plugin never rewrites another note to fix a link.
+- **Obsidian respells its own wikilinks.** Open question T8 in `roadmap.md` covers the person who turned that setting off. A wikilink must name a path, because Obsidian has no link-by-identity form. When a title changes, the plugin renames the file through Obsidian's file-rename path, and Obsidian updates every inbound wikilink itself. The plugin never rewrites another note to fix a link.
 - **A respelt wikilink pushes nothing.** A wikilink that Obsidian respelt translates back to the same Papera link it did before. The push path compares the translated body, finds it unchanged, and sends nothing.
 
 ## Technical Notes

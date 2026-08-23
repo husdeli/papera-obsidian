@@ -52,7 +52,7 @@ leaves both versions intact.
 
 ### Architectural Considerations
 
-- **A delete is not recoverable through this plugin.** Deleting a note deletes the content unit. The design must decide whether the plugin asks first, or relies on Papera's own recovery.
+- **A delete is not recoverable through this plugin.** Deleting a note deletes the content unit. The product decides whether the plugin asks first, or relies on Papera's own recovery — see "What does deleting a note in the vault mean?" in `prd.md` section 8.
 - **A create needs a target project.** The note's folder names it, through the index.
 
 ## Testing

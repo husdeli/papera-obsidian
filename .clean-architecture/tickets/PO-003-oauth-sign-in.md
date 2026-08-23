@@ -35,7 +35,7 @@ can read that file. This is why the access token is short-lived.
 ## Implementation Steps
 
 1. **Discovery**: the plugin reads `/.well-known/oauth-authorization-server` to find the authorize and token endpoints.
-2. **Client registration**: Papera recognises the plugin as an OAuth client. Decide between a pre-registered client id and dynamic client registration.
+2. **Client registration**: Papera recognises the plugin as an OAuth client. Open question T4 in `roadmap.md` decides between a pre-registered client id and dynamic client registration.
 3. **Authorization**: the plugin generates a PKCE verifier and a state value, then opens the authorization URL in the browser.
 4. **Callback**: the protocol handler receives the code, checks the state, and exchanges the code for tokens.
 5. **Refresh**: the HTTP client refreshes the access token when it expires, and retries the request once.

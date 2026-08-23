@@ -37,7 +37,7 @@ stale, so a concurrent edit in the Papera editor is never lost.
 4. **Block ids**: the endpoint re-attaches the stored block ids, or it records the loss. Open question 3 in `roadmap.md` decides which.
 5. **Title**: a separate endpoint changes the title alone.
 6. **Create and delete**: the endpoints add and remove a content unit in a project.
-7. **Move**: decide whether a content unit can move between projects, given the project → workflow → node chain.
+7. **Move**: open question T6 in `roadmap.md` decides whether a content unit can move between projects, given the project → workflow → node chain.
 
 ## Decisions
 

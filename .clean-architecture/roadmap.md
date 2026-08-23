@@ -71,8 +71,36 @@ than repeating it.
 
 ## Open questions
 
-These three block PO-001. Every other ticket waits on PO-001.
+Technical decisions that are not settled. Each one names the tickets it blocks. Delete an
+entry once it is decided, and fold the answer into the ticket.
 
-1. **What is a "content file" in the vault?** A project holds workflows, and a workflow holds nodes, and a content-unit node holds the words. Does one project folder hold every content unit flat, or one subfolder per workflow?
-2. **Where does `papera_rev` come from?** Papera adds a revision counter to `content_units`, or the sync API returns an ETag that the plugin stores.
-3. **Do block ids survive the round trip?** Markdown carries no block id. Either the sync API keeps the ids server-side and re-attaches them on write, or the write path renumbers every block.
+| # | Question | Blocks |
+| --- | --- | --- |
+| T1 | **What is a "content file" in the vault?** A project holds workflows, and a workflow holds nodes, and a content-unit node holds the words. Does one project folder hold every content unit flat, or one subfolder per workflow? | PO-001, PO-004, PO-006 |
+| T2 | **Where does `papera_rev` come from?** Papera adds a revision counter to `content_units`, or the sync API returns an ETag that the plugin stores. | PO-001, PO-009, PO-011 |
+| T3 | **Do block ids survive the round trip?** Markdown carries no block id. Either the sync API keeps the ids server-side and re-attaches them on write, or the write path renumbers every block. | PO-001, PO-009 |
+| T4 | **Is the plugin a pre-registered OAuth client, or does it register dynamically?** A pre-registered client id ships in the bundle and needs a registry entry in Papera. Dynamic registration needs Papera to support it. | PO-003 |
+| T5 | **Does the media list extend the read API, or add its own endpoint?** The plugin needs to know which files a project holds before it can pull them. | PO-008 |
+| T6 | **Can a content unit move between projects at all?** A content unit belongs to a node inside a workflow draft inside a project. Moving one across projects may mean moving a node between workflows, which may not be expressible. | PO-009, PO-012 |
+| T7 | **Can Obsidian's attachment location be redirected per note?** If it cannot, the plugin moves a pasted file into the project's folder afterwards and rewrites the link. | PO-013 |
+| T8 | **Does Obsidian update inbound wikilinks when "Automatically update internal links" is off?** The rename path depends on Obsidian respelling its own links. A person who turned that setting off may see a stale wikilink after a rename in Papera. | PO-006, PO-014 |
+
+T1, T2 and T3 block PO-001, and PO-001 blocks most of the roadmap. The rest block one or
+two tickets each and do not hold up anything else.
+
+---
+
+## Product decisions that block tickets
+
+These are product questions, and they live in `prd.md` section 8. They are listed here
+because tickets wait on them. The question text stays in the PRD; this table only records
+what each one holds up.
+
+| PRD question | Blocks |
+| --- | --- |
+| How is a project's writing arranged in its folder? | PO-001, PO-004, PO-006 (the product half of T1) |
+| What does deleting a note in the vault mean? | PO-011, PO-012 |
+| Can writing move between projects? | PO-009, PO-012 (the product half of T6) |
+| What happens when a person renames a project folder by hand? | PO-012 |
+| What is offered when a person turns off a project holding unsent edits? | PO-007 |
+| Does one vault serve more than one Papera account? | PO-003, PO-004 |

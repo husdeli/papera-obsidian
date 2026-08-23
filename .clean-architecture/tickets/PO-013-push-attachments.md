@@ -43,7 +43,7 @@ pasted into a note in Obsidian appears in the Papera content unit.
 
 ### Architectural Considerations
 
-- **Obsidian's attachment location is a vault setting.** Redirecting it per note may not be possible for every Obsidian version. If it is not, the plugin moves the pasted file into `attachments/` after the fact and rewrites the link.
+- **Obsidian's attachment location is a vault setting.** Open question T7 in `roadmap.md` decides whether it can be redirected per note. If it cannot, the plugin moves the pasted file into `attachments/` afterwards and rewrites the link.
 - **A large upload on mobile may be slow.** The queue must not block note pushes behind one large file.
 
 ## Testing

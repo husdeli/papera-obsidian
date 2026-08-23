@@ -31,7 +31,7 @@ token.
 ## Implementation Steps
 
 1. **Bearer auth on the asset route**: `src/routes/api/projects/assets/$.ts` in `~/Projects/slide-weaver` accepts a bearer token in addition to the session cookie.
-2. **Media list**: the API lists the media a project holds. Decide whether this extends PO-001 or adds an endpoint.
+2. **Media list**: the API lists the media a project holds. Open question T5 in `roadmap.md` decides whether this extends PO-001 or adds an endpoint.
 3. **Download**: the plugin writes each file into the project's `attachments/` folder through the vault API.
 4. **Link rewriting**: an image reference in a pulled note points at the local attachment, under the PO-005 rules.
 5. **Change detection**: the index records what was downloaded, so a repeat pull skips it.
