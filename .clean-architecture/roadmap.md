@@ -18,16 +18,20 @@ says so.
 | PO-003 | OAuth sign-in and token refresh | ⬜ **Pending** | this | PO-002 | `tickets/PO-003-oauth-sign-in.md` |
 | PO-004 | Reserved root, name safety and the vault index | ⬜ **Pending** | this | PO-002 | `tickets/PO-004-reserved-root-and-index.md` |
 | PO-005 | Link translation design pass | ⬜ **Pending** | this | PO-001 | `tickets/PO-005-link-translation-design.md` |
-| PO-006 | Pull projects and content units | ⬜ **Pending** | this | PO-001, PO-003, PO-004, PO-005 | `tickets/PO-006-pull-content.md` |
+| PO-014 | Link translation, both directions | ⬜ **Pending** | this | PO-004, PO-005 | `tickets/PO-014-link-translation.md` |
+| PO-006 | Pull projects and content units | ⬜ **Pending** | this | PO-001, PO-003, PO-004, PO-014 | `tickets/PO-006-pull-content.md` |
 | PO-007 | Selective sync settings tab | ⬜ **Pending** | this | PO-006 | `tickets/PO-007-selective-sync-settings.md` |
 | PO-008 | Pull attachments | ⬜ **Pending** | this | PO-006 | `tickets/PO-008-pull-attachments.md` |
 | PO-009 | Sync write API in Papera | ⬜ **Pending** | slide-weaver | PO-001 | `tickets/PO-009-sync-write-api.md` |
 | PO-010 | Vault change detection and the push queue | ⬜ **Pending** | this | PO-006 | `tickets/PO-010-change-detection-and-queue.md` |
-| PO-011 | Push with conflict detection | ⬜ **Pending** | this | PO-009, PO-010 | `tickets/PO-011-push-with-conflicts.md` |
+| PO-011 | Push with conflict detection | ⬜ **Pending** | this | PO-009, PO-010, PO-014 | `tickets/PO-011-push-with-conflicts.md` |
 | PO-012 | Renames, moves and trash | ⬜ **Pending** | this | PO-011 | `tickets/PO-012-renames-moves-and-trash.md` |
 | PO-013 | Push attachments | ⬜ **Pending** | this | PO-008, PO-011 | `tickets/PO-013-push-attachments.md` |
 
-PO-002 through PO-008 ship Phase 1. PO-009 through PO-013 ship Phase 2.
+PO-002 through PO-008 and PO-014 ship Phase 1. PO-009 through PO-013 ship Phase 2.
+
+PO-014 is numbered last and ordered fifth. The table is ordered by dependency, not by
+number, so the existing tickets kept their identifiers when it was added.
 
 ---
 

@@ -59,11 +59,12 @@ URL-matching problem.
 
 - **Manual**:
   - [ ] A reviewer reads the section and can state what happens to a wikilink whose target is not synced.
+  - [ ] Every case the section names is buildable as a PO-014 test, with no rule left implicit.
   - [ ] A reviewer can state what a round trip loses.
 
 ## Related
 
-- Related Tickets: PO-006 and PO-011 both implement what this ticket specifies
+- Related Tickets: PO-014 implements what this ticket specifies. PO-006 and PO-011 call it.
 
 ---
 

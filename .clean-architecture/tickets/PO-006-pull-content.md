@@ -21,7 +21,7 @@ after a rename.
 - [ ] Each selected project becomes one folder under the reserved root, named by the PO-004 sanitizer.
 - [ ] Each content unit becomes one `.md` file inside its project folder.
 - [ ] Each note carries `papera_id`, `papera_rev` and `updated_at` in YAML frontmatter.
-- [ ] The note body is the Markdown the API returns, with links translated by the PO-005 rules.
+- [ ] The note body is the Markdown the API returns, with links translated by the PO-014 module.
 - [ ] A second pull with no change in Papera writes no file.
 - [ ] A content unit whose revision changed overwrites the local note, in Phase 1.
 - [ ] A content unit deleted in Papera removes the local note.
@@ -36,7 +36,7 @@ after a rename.
 
 1. **Read the selection**: the pull reads which projects sync from the settings.
 2. **Project folders**: the pull creates, renames or keeps one folder per selected project.
-3. **Content units**: the pull writes one note per content unit, with frontmatter and translated links.
+3. **Content units**: the pull writes one note per content unit, with frontmatter, and with its links translated by the PO-014 module. This ticket holds no translation logic of its own.
 4. **Change detection**: the pull compares the API revision against the revision in the index, and writes only what changed.
 5. **Deletions**: a content unit missing from the API removes its note and its index entry.
 6. **Failure isolation**: a `403` or a network failure is recorded per project, and the pull continues.
@@ -70,7 +70,7 @@ after a rename.
 
 ## Related
 
-- Related Tickets: PO-001, PO-003, PO-004, PO-005
+- Related Tickets: PO-001, PO-003, PO-004, PO-014
 
 ---
 

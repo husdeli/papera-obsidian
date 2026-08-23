@@ -25,14 +25,14 @@ leaves both versions intact.
 - [ ] The original note keeps the user's local text, unchanged.
 - [ ] A conflict file carries no `papera_id`, so it never syncs and never pushes.
 - [ ] The plugin tells the user a conflict happened, and names the note.
-- [ ] Links translate from wikilinks to Papera links under the PO-005 rules before the push.
+- [ ] Links translate from wikilinks to Papera links through the PO-014 module before the push.
 - [ ] A `403` on one note does not stop the queue.
 - [ ] A note created by hand under a project folder creates a content unit in Papera, and gains a `papera_id`.
 - [ ] A note deleted under a project folder deletes the content unit in Papera.
 
 ## Implementation Steps
 
-1. **Push a change**: the queue worker reads the note, translates its links, and calls the write endpoint.
+1. **Push a change**: the queue worker reads the note, translates its links through the PO-014 module, and calls the write endpoint. This ticket holds no translation logic of its own.
 2. **Record the result**: a successful push writes the new revision into the frontmatter and into the index.
 3. **Detect a conflict**: a `409` triggers the conflict path.
 4. **Write the conflict file**: the plugin fetches the Papera version and writes it to `<note> (conflict <date>).md`, with no `papera_id`.
@@ -55,7 +55,7 @@ leaves both versions intact.
 
 ## Testing
 
-- **Unit**: the conflict filename; the frontmatter write-back; the conflict file's missing `papera_id`; the link translation on the push side.
+- **Unit**: the conflict filename; the frontmatter write-back; the conflict file's missing `papera_id`.
 - **API**: the push, the `409`, and the `403`.
 - **E2E**: edit one note in Papera and the same note in the vault, push, and confirm both versions survive.
 - **Manual**:
@@ -64,7 +64,7 @@ leaves both versions intact.
 
 ## Related
 
-- Related Tickets: PO-009, PO-010, PO-005, PO-012
+- Related Tickets: PO-009, PO-010, PO-014, PO-012
 
 ---
 
