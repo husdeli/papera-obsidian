@@ -20,11 +20,11 @@ write passes through it. A missing check lets the plugin delete a note it does n
 - [ ] The reserved root folder name is a setting, and it defaults to `Papera`.
 - [ ] One function answers whether a vault path is inside the reserved root, and every vault read and write calls it first.
 - [ ] A path outside the reserved root is never read and never written.
-- [ ] One function turns a project name into a folder name that removes or replaces `/ \ : * ? " < > | # ^ [ ]`.
+- [ ] One function turns a project name or a workflow name into a folder name that removes or replaces `/ \ : * ? " < > | # ^ [ ]`.
 - [ ] A project name with a leading dot or a trailing space produces a folder name with neither.
 - [ ] A project name that sanitizes to an empty string produces a stable fallback name.
-- [ ] Two projects whose names sanitize to the same string produce two distinct folders.
-- [ ] A project rename in Papera renames the folder, and the folder keeps its identity through the rename.
+- [ ] Two projects whose names sanitize to the same string produce two distinct folders, and so do two workflows inside one project.
+- [ ] A project or workflow rename in Papera renames the folder, and the folder keeps its identity through the rename.
 - [ ] `.papera-index.json` lives under the reserved root and maps every Papera id to its vault path.
 - [ ] The index survives a plugin reinstall, and a reinstalled plugin re-adopts the existing folders.
 - [ ] The plugin reads the index before it subscribes to any vault event.
@@ -49,7 +49,7 @@ write passes through it. A missing check lets the plugin delete a note it does n
 
 ### Data Requirements
 
-- `.papera-index.json` maps a Papera project id to a folder path, and a Papera content unit id to a file path. It also records the last known revision per content unit.
+- `.papera-index.json` maps a Papera project id and a workflow id to a folder path, and a content unit id to a file path. It also records the last known revision per content unit.
 
 ### Architectural Considerations
 

@@ -23,9 +23,10 @@ stale, so a concurrent edit in the Papera editor is never lost.
 - [ ] An authenticated caller renames a content unit title without changing its body.
 - [ ] An authenticated caller creates a content unit in a project.
 - [ ] An authenticated caller deletes a content unit.
-- [ ] The endpoint either moves a content unit between two projects, or answers that a move is not supported.
+- [ ] The endpoint moves a whole workflow between two projects.
+- [ ] The endpoint answers that moving a single content unit between workflows is not supported.
 - [ ] The write path uses `markdownToContent`, and no second copy of the conversion rules exists.
-- [ ] Block ids survive a read-then-write round trip, or the endpoint documents that they do not.
+- [ ] The endpoint re-attaches the stored block ids on write, so a Markdown round trip does not renumber them.
 - [ ] A write to a project the caller may not write gets `403`.
 - [ ] The token carries a write scope that is separate from the read scope.
 
@@ -34,10 +35,10 @@ stale, so a concurrent edit in the Papera editor is never lost.
 1. **Write scope**: the OAuth token distinguishes read from write, so a Phase 1 install cannot write.
 2. **Revision check**: the write compares the caller's revision against the stored one, and answers `409` on a mismatch.
 3. **Write**: the endpoint converts the Markdown through `markdownToContent` and stores the result.
-4. **Block ids**: the endpoint re-attaches the stored block ids, or it records the loss. Open question 3 in `roadmap.md` decides which.
+4. **Block ids**: `markdownToContent` regenerates ids by design, so the endpoint re-attaches the stored ids after conversion. The plugin never carries an id.
 5. **Title**: a separate endpoint changes the title alone.
 6. **Create and delete**: the endpoints add and remove a content unit in a project.
-7. **Move**: open question T6 in `roadmap.md` decides whether a content unit can move between projects, given the project → workflow → node chain.
+7. **Move**: a workflow moves between projects by updating `workflow_draft.projectId`, which is a plain column. Moving one content unit between workflows would change the composite key `(workflow_id, lifecycle, node_id)` and every edge pointing at it, so the endpoint refuses it.
 
 ## Decisions
 
@@ -52,7 +53,7 @@ stale, so a concurrent edit in the Papera editor is never lost.
 
 ### Architectural Considerations
 
-- **A move may not be expressible.** A content unit belongs to a node inside a workflow draft inside a project. Moving one across projects may mean moving a node between workflows. If that is not supported, this endpoint says so, and PO-012 returns the file to its folder.
+- **A workflow moves, a note does not.** Moving a workflow between projects is one column update. Moving a note between workflows is graph surgery, so PO-012 returns such a file to its folder instead.
 
 ## Testing
 

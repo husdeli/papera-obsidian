@@ -21,7 +21,10 @@ that no local change is unpushed before it deletes anything.
 - [ ] Turning a project on pulls it on the next sync.
 - [ ] Turning a project off removes its folder from the vault.
 - [ ] Before it removes a folder, the plugin checks for local changes that Papera does not have.
-- [ ] When an unpushed change exists, the plugin names the affected notes and asks the user to confirm.
+- [ ] When an unpushed change exists, the plugin names the affected notes and offers to send them before it removes the folder.
+- [ ] Choosing to send waits for every edit to reach Papera, and removes the folder only after they all land.
+- [ ] A send that fails leaves the folder in place and reports which notes did not reach Papera.
+- [ ] Until the push path exists, the plugin names the affected notes and asks for confirmation instead of offering to send.
 - [ ] The reserved root folder name is editable, and changing it moves the existing folder rather than re-pulling.
 - [ ] The tab shows when the last sync ran, and what failed.
 - [ ] While the plugin has no push, the tab states that a local edit is overwritten on the next sync.
@@ -39,13 +42,14 @@ that no local change is unpushed before it deletes anything.
 ## Decisions
 
 - **Unsync deletes, and always asks first.** Removing a folder is the destructive action in this plugin, so it never runs silently.
+- **Unsync offers to send first.** Turning a project off must not cost the person work. The offer needs the push path, so it arrives with PO-011; before then the same check reports the notes and asks for confirmation.
 - **A root rename moves, it does not re-pull.** Re-pulling a large vault over a rename wastes the user's time and their bandwidth.
 
 ## Technical Notes
 
 ### Architectural Considerations
 
-- **In Phase 1 the unpushed check has nothing to push.** It still runs and still reports a locally modified note, because the user loses that edit when the folder goes.
+- **In Phase 1 the unpushed check has nothing to push.** It still runs and still reports a locally modified note, because the user loses that edit when the folder goes. The offer to send arrives with PO-011.
 
 ## Testing
 

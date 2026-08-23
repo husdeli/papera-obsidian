@@ -1,6 +1,6 @@
 # [PO-001] Sync read API in Papera
 
-**Status**: Blocked
+**Status**: Not Started
 **Priority**: Critical
 **Effort**: L
 **Category**: feature
@@ -13,29 +13,31 @@ Papera serves no API that lists a user's projects or returns the words in a cont
 Every other ticket in this roadmap waits on that API. This ticket builds the read half of
 it, authenticated by the OAuth access token the plugin already gets from PO-003.
 
-The ticket is **Blocked**. The three open questions in `roadmap.md` decide the shape of
-every response below.
+The layout, the revision source and the block-id behaviour are decided and recorded in the
+shared decisions in `roadmap.md`. The endpoints below follow them.
 
 ## Acceptance Criteria
 
 - [ ] An authenticated caller lists the projects the caller owns, each with its id, name and last change time.
-- [ ] An authenticated caller lists the content units in one project, each with its id, title, revision and last change time.
+- [ ] An authenticated caller lists the workflows in one project, each with its id and name.
+- [ ] An authenticated caller lists the content units in one workflow, each with its id, title, revision and last change time.
 - [ ] An authenticated caller reads one content unit as Markdown, with its revision.
 - [ ] The Markdown comes from `contentToMarkdown`, and no second copy of the conversion rules exists.
 - [ ] Every response carries a revision value that the plugin stores as `papera_rev`.
 - [ ] A caller who may not read a project gets `403` for that project alone.
 - [ ] A bearer token issued by `oauthProvider` authenticates every endpoint.
+- [ ] The sync API accepts the token audience the plugin is issued. See open question T9 in `roadmap.md`.
 - [ ] A session cookie does not authenticate these endpoints.
 - [ ] A list response pages, and the plugin can read a project of 5,000 content units.
 
 ## Implementation Steps
 
-1. **Decide the shape**: answer open questions 1 to 3 in `roadmap.md`. They decide whether a content unit is addressed by node identity or by a new stable id, and where the revision comes from.
+1. **Audience**: `auth.server.ts` sets `validAudiences: [MCP_RESOURCE_URL]`, which scopes every token to `/api/mcp`. Add the audience the sync API accepts, or it rejects every token the plugin holds.
 2. **Bearer authentication**: one guard turns an `Authorization: Bearer` header into a user id, using the tokens `oauthProvider` issues.
 3. **Project list**: the endpoint returns the caller's projects.
 4. **Content unit list**: the endpoint returns one project's content units.
 5. **Content unit read**: the endpoint returns one content unit as Markdown plus its revision.
-6. **Revision**: `content_units` gains a revision counter, or the endpoint returns an ETag. Open question 2 decides which.
+6. **Revision**: `content_units` gains a monotonic revision counter, as the shared decisions record.
 7. **Scopes**: the token carries a read scope, so PO-009 can add a separate write scope.
 
 ## Decisions
@@ -69,4 +71,5 @@ every response below.
 
 ## Iteration Log
 
-- **Iteration 1 (2026-08-23)**: Split out of the original single ticket → Blocked on open questions 1 to 3 → Status set to Blocked.
+- **Iteration 1 (2026-08-23)**: Split out of the original single ticket → Blocked on three open questions → Status set to Blocked.
+- **Iteration 2 (2026-08-23)**: The three questions were decided — one folder per workflow, a monotonic revision counter, and stored block ids re-attached on write → Status set to Not Started. One question remains, T9, on the token audience, and it is a step inside this ticket rather than a blocker.

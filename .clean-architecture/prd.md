@@ -91,9 +91,11 @@ Everything the plugin manages lives inside one folder in the vault. The person n
 folder, and it is called Papera unless they change it. Every other note in the vault is
 outside the plugin's reach, and stays exactly as the person left it.
 
-Inside the folder, each synced project is one subfolder. A project name that a folder cannot
-hold is adjusted to one that it can, and two projects sharing a name still get two distinct
-folders. Renaming a project in Papera renames its folder and keeps its notes in place.
+Inside the folder, each synced project is one subfolder, and inside a project each piece of
+work is a subfolder of its own holding that work's notes. The person sees the same grouping
+in the vault that they see in Papera. A name that a folder cannot hold is adjusted to one
+that it can, and two things sharing a name still get two distinct folders. Renaming
+something in Papera renames its folder and keeps its notes in place.
 
 The folder also carries the record of which Papera content each file holds. That record
 survives removing and reinstalling the plugin, so a person who reinstalls picks up where
@@ -102,8 +104,9 @@ they left off rather than syncing everything a second time.
 ### Bringing projects into the vault `SYNC`
 
 The person picks which of their projects sync. A project they turn on appears as a folder of
-Markdown notes. A project they turn off has its folder removed from the vault, and the plugin
-tells the person first when the folder holds an edit that Papera does not have yet.
+Markdown notes. When they turn one off, the plugin checks the folder for edits Papera has not
+received. It names those notes and offers to send them before it removes the folder, so
+turning a project off never costs the person work.
 
 A sync brings across what changed and leaves the rest alone. A note changed in Papera is
 updated in the vault. A note added in Papera appears. A note removed in Papera is removed.
@@ -121,8 +124,14 @@ Large changes behave the same as small ones. A find-and-replace touching hundred
 sends every one of them, paced so that Papera receives them in good order. The person sees
 how many changes are still on their way.
 
+A Papera note holds headings, paragraphs, lists, quotes, code blocks, tables, images and
+links. When a person adds bold, italic or inline code to a synced note, the plugin holds that
+note back rather than sending it, and tells them what Papera does not carry. Their text stays
+exactly as they wrote it, and they choose whether to keep it or plain it.
+
 Creating a Markdown file inside a project's folder creates that content in Papera. Deleting
-one removes it.
+a synced note deletes it in Papera too, and the plugin names the note and asks first, because
+deleting a file is a light gesture and removing the writing behind it is not.
 
 ### Note identity, renames and moves `IDENTITY`
 
@@ -130,10 +139,12 @@ A note's identity travels inside the note itself, in a short block at the top. T
 what makes a note the same note across a rename, a move, and a reinstall. The file name is a
 title, not an identity.
 
-Renaming a synced note therefore retitles it in Papera. Moving a note from one project's
-folder to another moves it between those projects. Moving a note out of the Papera folder
-takes it out of sync and leaves the Papera copy untouched, because the person moved their
-file rather than asking for a deletion.
+Renaming a synced note therefore retitles it in Papera. Moving a whole piece of work from one
+project to another moves it between those projects, because a piece of work belongs to a
+project as a unit. A single note belongs to the work it was written for, so the plugin returns
+a note dragged out of that group and explains why. Moving a note out of the Papera folder
+takes it out of sync and leaves the Papera copy untouched, because the person moved their file
+rather than asking for a deletion.
 
 ### Links between notes `LINKS`
 
@@ -164,8 +175,9 @@ person keeps the text they wrote. The other version arrives beside it as a secon
 so the person can see what it is, and the person decides what to keep.
 
 **The content is faithful.** A note that travels to the vault and back carries the same words,
-the same structure, and the same links. What the person reads in Obsidian is what Papera
-holds.
+the same structure, and the same links. What the person reads in Obsidian is what Papera holds.
+Where the vault can express something Papera does not carry, the plugin says so and holds the
+note rather than quietly changing it.
 
 **The words are portable.** A synced note is plain Markdown in a plain folder. It opens in any
 editor, it survives the plugin being removed, and it belongs to the person.
@@ -191,9 +203,5 @@ it was granted.
 
 ## 8. Open questions
 
-- **How is a project's writing arranged in its folder?** A project holds more than one piece of writing, and those pieces are grouped in Papera. The product must decide whether a project's folder holds every note side by side, or mirrors the grouping as subfolders. This blocks the folder layout, the link behaviour, and what a move between folders means.
-- **What does deleting a note in the vault mean?** Deleting a file is easy and common, and it currently removes the content in Papera. The product must decide whether the plugin asks first, whether Papera keeps a recoverable copy, or whether a delete only takes the note out of sync.
-- **Can writing move between projects?** Moving a note between two project folders is a natural gesture in a vault. The product must decide whether Papera supports that move, and what the person sees when it does not.
-- **What happens when a person renames a project folder by hand?** The folder carries a project's name, and the person can rename it in the vault like any other folder. The product must decide whether that renames the project in Papera, or whether the next sync restores the name.
-- **What is offered when a person turns off a project holding unsent edits?** The plugin warns them today. The product must decide whether it also offers to send those edits first, or to keep the folder.
+- **What happens when a person renames a folder by hand?** A folder in the vault carries the name of a project or of a piece of work. The person can rename it like any other folder. The product must decide whether that renames the thing in Papera, or whether the next sync restores the name.
 - **Does one vault serve more than one Papera account?** A person with a personal account and a work account may want both in one vault. The product must decide whether that is supported, and how the folder separates them.

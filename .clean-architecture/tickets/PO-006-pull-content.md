@@ -19,7 +19,9 @@ after a rename.
 
 - [ ] A "Sync now" command pulls every selected project.
 - [ ] Each selected project becomes one folder under the reserved root, named by the PO-004 sanitizer.
-- [ ] Each content unit becomes one `.md` file inside its project folder.
+- [ ] Each workflow in a project becomes one folder inside its project folder.
+- [ ] Each content unit becomes one `.md` file inside its workflow folder.
+- [ ] A project folder holds one `attachments/` folder, shared by its workflow folders.
 - [ ] Each note carries `papera_id`, `papera_rev` and `updated_at` in YAML frontmatter.
 - [ ] The note body is the Markdown the API returns, with links translated by the PO-014 module.
 - [ ] A second pull with no change in Papera writes no file.
@@ -37,7 +39,7 @@ after a rename.
 ## Implementation Steps
 
 1. **Read the selection**: the pull reads which projects sync from the settings.
-2. **Project folders**: the pull creates, renames or keeps one folder per selected project.
+2. **Folders**: the pull creates, renames or keeps one folder per selected project, and one folder per workflow inside it.
 3. **Content units**: the pull writes one note per content unit, with frontmatter, and with its links translated by the PO-014 module. This ticket holds no translation logic of its own.
 4. **Change detection**: the pull compares the API revision against the revision in the index, and writes only what changed.
 5. **Deletions**: a content unit missing from the API removes its note and its index entry.

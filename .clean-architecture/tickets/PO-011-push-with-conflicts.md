@@ -30,7 +30,11 @@ leaves both versions intact.
 - [ ] A wikilink respelt by Obsidian after a rename therefore pushes nothing.
 - [ ] A `403` on one note does not stop the queue.
 - [ ] A note created by hand under a project folder creates a content unit in Papera, and gains a `papera_id`.
-- [ ] A note deleted under a project folder deletes the content unit in Papera.
+- [ ] A note deleted under a project folder deletes the content unit in Papera, after the plugin names the note and the person confirms.
+- [ ] Declining the confirmation leaves the content unit in Papera and takes the note out of the index.
+- [ ] A note holding bold, italic or inline code is held back from the push, and the plugin tells the person that Papera carries plain text and links.
+- [ ] A note held back keeps the person's text exactly as they wrote it, and the plugin never removes the emphasis on their behalf.
+- [ ] The plugin offers to remove the emphasis and send, so a held note is not stuck.
 
 ## Implementation Steps
 
@@ -40,7 +44,8 @@ leaves both versions intact.
 4. **Write the conflict file**: the plugin fetches the Papera version and writes it to `<note> (conflict <date>).md`, with no `papera_id`.
 5. **Report**: the plugin names every conflicted note to the user.
 6. **Create**: a new `.md` file under a project folder creates a content unit and gains an id.
-7. **Delete**: a deleted note deletes the content unit.
+7. **Delete**: a deleted note deletes the content unit, after a confirmation naming it.
+8. **Emphasis**: the push detects bold, italic and inline code, holds the note, and tells the person. It offers to plain the text and send.
 
 ## Decisions
 
@@ -52,7 +57,8 @@ leaves both versions intact.
 
 ### Architectural Considerations
 
-- **A delete is not recoverable through this plugin.** Deleting a note deletes the content unit. The product decides whether the plugin asks first, or relies on Papera's own recovery — see "What does deleting a note in the vault mean?" in `prd.md` section 8.
+- **A delete asks first.** Deleting a file is a light gesture and removing a content unit is not, so the plugin names the note and waits for a yes.
+- **Emphasis is held, never stripped silently.** Papera's content model carries plain text and links, with no bold, italic or inline code. Flattening a person's formatting without telling them would break the product's own promise that nothing is lost quietly.
 - **A create needs a target project.** The note's folder names it, through the index.
 
 ## Testing

@@ -8,12 +8,14 @@ The plugin syncs Papera projects into one reserved root folder in a single Obsid
 Phase 1 ships a read-only pull. Phase 2 adds write-back. A failed write costs the user work
 that a failed read does not.
 
+Nothing is blocked. PO-001 is the first task, and it is built in the Papera application.
+
 Two tasks are built in the Papera application, not in this repository. Their **Repo** column
 says so.
 
 | ID | Task | Status | Repo | Depends on | Ticket |
 | --- | --- | --- | --- | --- | --- |
-| PO-001 | Sync read API in Papera | 🚫 **Blocked** | slide-weaver | Open questions 1–3 | `tickets/PO-001-sync-read-api.md` |
+| PO-001 | Sync read API in Papera | ⬜ **Pending** | slide-weaver | — | `tickets/PO-001-sync-read-api.md` |
 | PO-002 | Plugin skeleton and mobile-safe HTTP | ⬜ **Pending** | this | — | `tickets/PO-002-plugin-skeleton.md` |
 | PO-003 | OAuth sign-in and token refresh | ⬜ **Pending** | this | PO-002 | `tickets/PO-003-oauth-sign-in.md` |
 | PO-004 | Reserved root, name safety and the vault index | ⬜ **Pending** | this | PO-002 | `tickets/PO-004-reserved-root-and-index.md` |
@@ -47,6 +49,14 @@ These hold across every ticket. Do not re-open them in a plan.
 - **Pull first, push second.** Phase 1 ships read-only.
 - **Token storage.** The access token lands in `data.json` in plaintext, so the plugin uses a short-lived access token with a refresh token.
 - **Per-project failure isolation.** A `403` on one project drops that project's folder from the sync and leaves the rest running.
+- **One subfolder per workflow.** A project folder holds one subfolder per workflow, and a workflow folder holds its notes. This mirrors Papera's real structure, and it is what makes a workflow folder movable between projects.
+- **Attachments stay at project level.** `project_media` is keyed by project, so a project folder holds one `attachments/` folder that its workflow folders share.
+- **A whole workflow moves; a single note does not.** `workflow_draft.projectId` is a plain column, so moving a workflow folder between projects is a one-column update. Moving one note between workflows would change the composite key `(workflow_id, lifecycle, node_id)` and every edge pointing at it, so the plugin reverses that move instead.
+- **Emphasis is never dropped silently.** Papera's content model holds plain text and links, with no bold, italic or inline code. A note carrying emphasis is held back from the push, and the person is told. Their text is left exactly as they wrote it.
+- **A vault delete asks before it deletes in Papera.** Deleting a file is a light gesture and removing a content unit is not, so the plugin names the note and asks first.
+- **Unsyncing offers to send first.** When a project holding unsent edits is turned off, the plugin offers to push those edits before it removes the folder.
+- **Revision is a counter, not an ETag.** `content_units` gains a monotonic revision counter. An ETag over the serialized content would change whenever serialization changes, which would make every note look modified after a Papera deploy.
+- **Block ids do not survive Markdown.** `markdownToContent` regenerates them, by its own design. Papera re-attaches the stored ids on write; the plugin never carries them.
 
 Out of scope for every ticket: multi-vault mapping, one vault per project, real-time
 collaboration, and Obsidian Publish integration.
@@ -76,17 +86,13 @@ entry once it is decided, and fold the answer into the ticket.
 
 | # | Question | Blocks |
 | --- | --- | --- |
-| T1 | **What is a "content file" in the vault?** A project holds workflows, and a workflow holds nodes, and a content-unit node holds the words. Does one project folder hold every content unit flat, or one subfolder per workflow? | PO-001, PO-004, PO-006 |
-| T2 | **Where does `papera_rev` come from?** Papera adds a revision counter to `content_units`, or the sync API returns an ETag that the plugin stores. | PO-001, PO-009, PO-011 |
-| T3 | **Do block ids survive the round trip?** Markdown carries no block id. Either the sync API keeps the ids server-side and re-attaches them on write, or the write path renumbers every block. | PO-001, PO-009 |
-| T4 | **Is the plugin a pre-registered OAuth client, or does it register dynamically?** A pre-registered client id ships in the bundle and needs a registry entry in Papera. Dynamic registration needs Papera to support it. | PO-003 |
 | T5 | **Does the media list extend the read API, or add its own endpoint?** The plugin needs to know which files a project holds before it can pull them. | PO-008 |
-| T6 | **Can a content unit move between projects at all?** A content unit belongs to a node inside a workflow draft inside a project. Moving one across projects may mean moving a node between workflows, which may not be expressible. | PO-009, PO-012 |
 | T7 | **Can Obsidian's attachment location be redirected per note?** If it cannot, the plugin moves a pasted file into the project's folder afterwards and rewrites the link. | PO-013 |
 | T8 | **Does Obsidian update inbound wikilinks when "Automatically update internal links" is off?** The rename path depends on Obsidian respelling its own links. A person who turned that setting off may see a stale wikilink after a rename in Papera. | PO-006, PO-014 |
+| T9 | **Which token audience does the sync API accept?** `auth.server.ts` sets `validAudiences: [MCP_RESOURCE_URL]`, which scopes every token to `/api/mcp`. The sync API needs its own audience, or it rejects every token the plugin holds. | PO-001, PO-003 |
 
-T1, T2 and T3 block PO-001, and PO-001 blocks most of the roadmap. The rest block one or
-two tickets each and do not hold up anything else.
+None of these block PO-001 any more. T1, T2, T3 and T6 are decided and recorded in the
+shared decisions above.
 
 ---
 
@@ -98,9 +104,5 @@ what each one holds up.
 
 | PRD question | Blocks |
 | --- | --- |
-| How is a project's writing arranged in its folder? | PO-001, PO-004, PO-006 (the product half of T1) |
-| What does deleting a note in the vault mean? | PO-011, PO-012 |
-| Can writing move between projects? | PO-009, PO-012 (the product half of T6) |
-| What happens when a person renames a project folder by hand? | PO-012 |
-| What is offered when a person turns off a project holding unsent edits? | PO-007 |
+| What happens when a person renames a project folder or a workflow folder by hand? | PO-012 |
 | Does one vault serve more than one Papera account? | PO-003, PO-004 |
