@@ -8,10 +8,8 @@ The plugin syncs Papera projects into one reserved root folder in a single Obsid
 Phase 1 ships a read-only pull. Phase 2 adds write-back. A failed write costs the user work
 that a failed read does not.
 
-Nothing is blocked. PO-001 is the first task, and it is built in the Papera application.
-
-Two tasks are built in the Papera application, not in this repository. Their **Repo** column
-says so.
+Nothing is blocked. PO-001 is the first task. It and PO-009 are built in the Papera
+application, not in this repository, as their **Repo** column says.
 
 | ID | Task | Status | Repo | Depends on | Ticket |
 | --- | --- | --- | --- | --- | --- |
@@ -57,6 +55,7 @@ These hold across every ticket. Do not re-open them in a plan.
 - **Unsyncing offers to send first.** When a project holding unsent edits is turned off, the plugin offers to push those edits before it removes the folder.
 - **Revision is a counter, not an ETag.** `content_units` gains a monotonic revision counter. An ETag over the serialized content would change whenever serialization changes, which would make every note look modified after a Papera deploy.
 - **Block ids do not survive Markdown.** `markdownToContent` regenerates them, by its own design. Papera re-attaches the stored ids on write; the plugin never carries them.
+- **Media has its own endpoint.** One endpoint lists everything one project holds, which is the single read `project_media` is indexed for. The content listing carries no attachment data.
 
 Out of scope for every ticket: multi-vault mapping, one vault per project, real-time
 collaboration, and Obsidian Publish integration.
@@ -86,7 +85,6 @@ entry once it is decided, and fold the answer into the ticket.
 
 | # | Question | Blocks |
 | --- | --- | --- |
-| T5 | **Does the media list extend the read API, or add its own endpoint?** The plugin needs to know which files a project holds before it can pull them. | PO-008 |
 | T7 | **Can Obsidian's attachment location be redirected per note?** If it cannot, the plugin moves a pasted file into the project's folder afterwards and rewrites the link. | PO-013 |
 | T8 | **Does Obsidian update inbound wikilinks when "Automatically update internal links" is off?** The rename path depends on Obsidian respelling its own links. A person who turned that setting off may see a stale wikilink after a rename in Papera. | PO-006, PO-014 |
 | T9 | **Which token audience does the sync API accept?** `auth.server.ts` sets `validAudiences: [MCP_RESOURCE_URL]`, which scopes every token to `/api/mcp`. The sync API needs its own audience, or it rejects every token the plugin holds. | PO-001, PO-003 |

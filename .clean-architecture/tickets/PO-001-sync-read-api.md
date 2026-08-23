@@ -22,6 +22,7 @@ shared decisions in `roadmap.md`. The endpoints below follow them.
 - [ ] An authenticated caller lists the workflows in one project, each with its id and name.
 - [ ] An authenticated caller lists the content units in one workflow, each with its id, title, revision and last change time.
 - [ ] An authenticated caller reads one content unit as Markdown, with its revision.
+- [ ] An authenticated caller lists the media one project holds, through an endpoint of its own.
 - [ ] The Markdown comes from `contentToMarkdown`, and no second copy of the conversion rules exists.
 - [ ] Every response carries a revision value that the plugin stores as `papera_rev`.
 - [ ] A caller who may not read a project gets `403` for that project alone.
