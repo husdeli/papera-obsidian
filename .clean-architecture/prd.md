@@ -144,6 +144,9 @@ the other way and works in Papera.
 A link whose target is not synced keeps working as a link to Papera. A link the person writes
 to one of their own notes outside the Papera folder stays their own text, unchanged.
 
+A link holds on to the note it points at, not to the note's title. Retitling a draft leaves
+every link to it working, in both places, and changes nothing in the notes that point at it.
+
 ### Images and files `ATTACHMENTS`
 
 Each synced project carries its images and files alongside its notes, in a folder of their

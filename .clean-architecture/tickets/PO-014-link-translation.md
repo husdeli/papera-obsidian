@@ -38,6 +38,8 @@ tests are the acceptance gate, not an addition to it.
 - [ ] A round-trip test proves that wikilink to Papera link to wikilink returns the original wikilink.
 - [ ] Two notes sharing a title in two synced projects each translate to a wikilink that resolves to the right one.
 - [ ] Translating a note that holds no link returns the note byte for byte unchanged.
+- [ ] Renaming a content unit in Papera changes no link data in any other note.
+- [ ] After Obsidian respells an inbound wikilink for a renamed note, that note translates back to the same Papera link as before.
 
 ## Implementation Steps
 
@@ -54,6 +56,9 @@ tests are the acceptance gate, not an addition to it.
 - **An unresolvable link is never dropped.** In every failure case the person's text survives as they wrote it. A lost link is a visible loss, and a mangled one is worse.
 - **Round-trip stability is a hard requirement.** A translation that does not return the original makes a note change on every sync with nobody editing it. Papera then records an endless run of revisions.
 - **No rule is invented here.** PO-005 owns the rules. This ticket owns the code and the proof.
+- **Links are held by identity, not by title.** A Papera link addresses a content unit by its identity, and that identity does not change when the title changes. Renaming one note therefore changes no data in any other note.
+- **Obsidian respells its own wikilinks.** A wikilink must name a path, because Obsidian has no link-by-identity form. When a title changes, the plugin renames the file through Obsidian's file-rename path, and Obsidian updates every inbound wikilink itself. The plugin never rewrites another note to fix a link.
+- **A respelt wikilink pushes nothing.** A wikilink that Obsidian respelt translates back to the same Papera link it did before. The push path compares the translated body, finds it unchanged, and sends nothing.
 
 ## Technical Notes
 
@@ -65,7 +70,7 @@ tests are the acceptance gate, not an addition to it.
 
 - **Resolution is asymmetric.** Obsidian resolves a wikilink by note title across the whole vault, and Papera resolves a link by URL. A title is not unique and a URL is. Two synced notes sharing a title are unambiguous to Papera and ambiguous to Obsidian, so the wikilink must carry enough path to disambiguate.
 - **The module is pure.** It takes a note body and the resolution data, and returns a note body. It reads no file and makes no request, which is what makes the round-trip corpus cheap to run.
-- **A title change moves every inbound link.** Renaming a note in Papera changes the wikilink text in every note that points at it. Decide whether the pull rewrites those notes, or whether Obsidian's own link updating covers it.
+- **A rename never touches another note's data.** A link is held by identity on the Papera side, so a title change does not change the link. What changes is only how Obsidian spells that link in the vault, and Obsidian is what respells it. See the decision below.
 
 ## Testing
 

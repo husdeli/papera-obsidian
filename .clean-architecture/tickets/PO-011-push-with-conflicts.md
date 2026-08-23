@@ -26,6 +26,8 @@ leaves both versions intact.
 - [ ] A conflict file carries no `papera_id`, so it never syncs and never pushes.
 - [ ] The plugin tells the user a conflict happened, and names the note.
 - [ ] Links translate from wikilinks to Papera links through the PO-014 module before the push.
+- [ ] A note whose translated body matches what Papera already holds sends nothing.
+- [ ] A wikilink respelt by Obsidian after a rename therefore pushes nothing.
 - [ ] A `403` on one note does not stop the queue.
 - [ ] A note created by hand under a project folder creates a content unit in Papera, and gains a `papera_id`.
 - [ ] A note deleted under a project folder deletes the content unit in Papera.

@@ -26,6 +26,8 @@ after a rename.
 - [ ] A content unit whose revision changed overwrites the local note, in Phase 1.
 - [ ] A content unit deleted in Papera removes the local note.
 - [ ] A content unit renamed in Papera renames the local note and keeps its `papera_id`.
+- [ ] The pull renames a note through Obsidian's file-rename path, so Obsidian updates every inbound wikilink itself.
+- [ ] A rename writes no other note. The plugin never edits a second note to fix a link.
 - [ ] A project that answers `403` drops from the sync, and every other project still syncs.
 - [ ] A network failure on one content unit does not abandon the rest of the project.
 - [ ] The pull reports per-project success and failure to the user.
@@ -46,6 +48,7 @@ after a rename.
 
 - **Phase 1 overwrites local edits.** The plugin has no push yet, so a local edit has nowhere to go. The settings tab must say so plainly until PO-011 ships.
 - **Revision drives the write.** Comparing revisions avoids rewriting every note on every sync, which would make Obsidian re-index the whole vault.
+- **A rename goes through Obsidian, not around it.** Obsidian's file-rename path updates inbound wikilinks on its own. A raw write plus delete would leave every link to the note broken.
 
 ## Technical Notes
 
