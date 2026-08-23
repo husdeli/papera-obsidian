@@ -67,7 +67,7 @@ already know how to work with, and their edits travel back on their own.
 
 | Persona | Need | Primary flow |
 | --- | --- | --- |
-| The vault-first writer | To draft in the editor they already live in | Syncs a project, writes the draft in Obsidian, and finds it in Papera when they open it |
+| The vault-first writer | To draft in the editor they already live in, and to move between related drafts as linked notes | Syncs a project, writes in Obsidian, follows a link from one draft to another, and finds both changes in Papera |
 | The Papera-first author | A local copy of their work they can read anywhere | Syncs every project, and reads or fixes a draft offline on a phone |
 | The archivist | Confidence that their writing is not held in one place | Syncs everything, and keeps the vault as a plain-text record |
 | The bulk editor | To make one change across many drafts at once | Runs a find-and-replace across a synced project and lets every change travel back |
