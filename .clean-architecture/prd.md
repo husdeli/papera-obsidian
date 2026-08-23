@@ -69,7 +69,6 @@ already know how to work with, and their edits travel back on their own.
 | --- | --- | --- |
 | The vault-first writer | To draft in the editor they already live in | Syncs a project, writes the draft in Obsidian, and finds it in Papera when they open it |
 | The Papera-first author | A local copy of their work they can read anywhere | Syncs every project, and reads or fixes a draft offline on a phone |
-| The researcher | To link Papera drafts to their own reading notes | Syncs one project, and points their own notes at it with Obsidian links |
 | The archivist | Confidence that their writing is not held in one place | Syncs everything, and keeps the vault as a plain-text record |
 | The bulk editor | To make one change across many drafts at once | Runs a find-and-replace across a synced project and lets every change travel back |
 
