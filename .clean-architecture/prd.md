@@ -43,7 +43,7 @@ already know how to work with, and their edits travel back on their own.
 
 ### Goals
 
-- A person connects their Papera account to one vault, and every project they own is available to sync.
+- A person connects one Papera account to one vault, and every project they own is available to sync.
 - The person chooses which projects sync into the vault, and changes that choice at any time.
 - Every synced project appears as one folder of Markdown notes inside a single folder the person names.
 - The plugin reads and writes only inside that folder.
@@ -59,6 +59,7 @@ already know how to work with, and their edits travel back on their own.
 
 - **One vault per project.** An Obsidian plugin installs into a single vault, so one vault holds every project. Splitting projects across vaults would mean one install per project, which the person would have to maintain by hand.
 - **Real-time collaboration.** Two people editing one note at the same moment is out of scope today. The product handles a conflict after the fact rather than preventing one.
+- **Two Papera accounts in one vault.** A vault holds one account's work. Mixing a personal and a work account in one folder would make every note's ownership ambiguous, and a person who needs both keeps a vault for each.
 - **Obsidian Publish integration.** Papera already publishes content. Adding a second publishing path is out of scope today.
 - **Syncing a person's own notes into Papera.** The plugin carries Papera content into the vault. Notes the person writes outside the Papera folder stay theirs alone.
 - **Editing Papera content the vault cannot represent.** A note is Markdown. Parts of a project that are not writing are visible in Papera, not in the vault.
@@ -79,6 +80,10 @@ already know how to work with, and their edits travel back on their own.
 The person signs in to Papera once per vault, through their browser. Papera asks them to
 approve the vault, and returns them to Obsidian. One sign-in covers every project the
 person owns, so adding a project later needs no new approval.
+
+A vault belongs to one Papera account. The folder records which account its notes came from,
+so a person signing in with a second account is told that this vault already holds another
+account's work, and is offered the choice to sign in again as the first.
 
 The sign-in stays valid on its own. The person signs in again only if they sign out, or if
 they withdraw the vault's access from Papera. Signing out stops the sync and leaves every
@@ -204,4 +209,3 @@ it was granted.
 ## 8. Open questions
 
 - **What happens when a person renames a folder by hand?** A folder in the vault carries the name of a project or of a piece of work. The person can rename it like any other folder. The product must decide whether that renames the thing in Papera, or whether the next sync restores the name.
-- **Does one vault serve more than one Papera account?** A person with a personal account and a work account may want both in one vault. The product must decide whether that is supported, and how the folder separates them.

@@ -28,6 +28,9 @@ can read that file. This is why the access token is short-lived.
 - [ ] The plugin stores an access token and a refresh token in `data.json`.
 - [ ] An expired access token refreshes without any user action.
 - [ ] One token per vault covers every project the user owns.
+- [ ] The plugin records which Papera account the vault is signed in as.
+- [ ] Signing in as a second account, while the reserved root holds another account's notes, is refused with an explanation.
+- [ ] The refusal leaves every synced note in place and does not clear the first account's tokens.
 - [ ] A failed refresh puts the plugin in a signed-out state and deletes no vault file.
 - [ ] "Sign out" clears both tokens and deletes no vault file.
 - [ ] The HTTP client from PO-002 attaches the access token to every Papera request.
@@ -46,12 +49,13 @@ can read that file. This is why the access token is short-lived.
 - **Public client with PKCE**: a plugin bundle is readable, so it holds no client secret.
 - **Short-lived access token with refresh**: `data.json` is plaintext, so a leaked access token expires quickly. Papera already stores refresh tokens in `oauth_refresh_token`.
 - **A sign-out never deletes notes**: losing a token is not the same as unsyncing a project. PO-007 owns unsyncing.
+- **One vault, one Papera account**: mixing two accounts in one folder would make every note's ownership ambiguous. The plugin detects the second account and refuses rather than merging.
 
 ## Technical Notes
 
 ### Data Requirements
 
-- `data.json` holds the access token, the refresh token and the expiry time.
+- `data.json` holds the access token, the refresh token, the expiry time, and the Papera account the vault is signed in as.
 
 ### Architectural Considerations
 
@@ -66,6 +70,7 @@ can read that file. This is why the access token is short-lived.
   - [ ] Sign in on desktop and confirm the browser returns to the vault.
   - [ ] Sign in on mobile.
   - [ ] Revoke the token in Papera and confirm the plugin signs out and deletes nothing.
+  - [ ] Sign in as a second account with notes already synced, and confirm the plugin refuses and keeps every note.
 
 ## Related
 

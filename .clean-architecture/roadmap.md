@@ -56,6 +56,7 @@ These hold across every ticket. Do not re-open them in a plan.
 - **Revision is a counter, not an ETag.** `content_units` gains a monotonic revision counter. An ETag over the serialized content would change whenever serialization changes, which would make every note look modified after a Papera deploy.
 - **Block ids do not survive Markdown.** `markdownToContent` regenerates them, by its own design. Papera re-attaches the stored ids on write; the plugin never carries them.
 - **Media has its own endpoint.** One endpoint lists everything one project holds, which is the single read `project_media` is indexed for. The content listing carries no attachment data.
+- **One vault, one Papera account.** The reserved root holds one account's projects. The index records which account the folder belongs to, so signing in as a different account is detected and refused rather than mixing two accounts' content in one folder.
 
 Out of scope for every ticket: multi-vault mapping, one vault per project, real-time
 collaboration, and Obsidian Publish integration.
@@ -103,4 +104,3 @@ what each one holds up.
 | PRD question | Blocks |
 | --- | --- |
 | What happens when a person renames a project folder or a workflow folder by hand? | PO-012 |
-| Does one vault serve more than one Papera account? | PO-003, PO-004 |

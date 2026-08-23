@@ -29,6 +29,7 @@ write passes through it. A missing check lets the plugin delete a note it does n
 - [ ] The index survives a plugin reinstall, and a reinstalled plugin re-adopts the existing folders.
 - [ ] The plugin reads the index before it subscribes to any vault event.
 - [ ] A corrupt or missing index rebuilds from the `papera_id` values in the note frontmatter.
+- [ ] The index records which Papera account the reserved root belongs to, so PO-003 can detect a second account.
 
 ## Implementation Steps
 
@@ -49,7 +50,7 @@ write passes through it. A missing check lets the plugin delete a note it does n
 
 ### Data Requirements
 
-- `.papera-index.json` maps a Papera project id and a workflow id to a folder path, and a content unit id to a file path. It also records the last known revision per content unit.
+- `.papera-index.json` records the Papera account the folder belongs to. It maps a project id and a workflow id to a folder path, and a content unit id to a file path. It also records the last known revision per content unit.
 
 ### Architectural Considerations
 
