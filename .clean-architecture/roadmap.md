@@ -9,7 +9,9 @@ Phase 1 ships a read-only pull. Phase 2 adds write-back. A failed write costs th
 that a failed read does not.
 
 Nothing is blocked. PO-001 is the first task. It and PO-009 are built in the Papera
-application, not in this repository, as their **Repo** column says.
+application, not in this repository, as their **Repo** column says. **Their code is
+written in the `slide-weaver` repository, never from this one.** Work on them here goes
+as far as the ticket and the decisions, and stops there.
 
 | ID | Task | Status | Repo | Depends on | Ticket |
 | --- | --- | --- | --- | --- | --- |
@@ -57,6 +59,9 @@ These hold across every ticket. Do not re-open them in a plan.
 - **Block ids do not survive Markdown.** `markdownToContent` regenerates them, by its own design. Papera re-attaches the stored ids on write; the plugin never carries them.
 - **Media has its own endpoint.** One endpoint lists everything one project holds, which is the single read `project_media` is indexed for. The content listing carries no attachment data.
 - **One vault, one Papera account.** The reserved root holds one account's projects. The index records which account the folder belongs to, so signing in as a different account is detected and refused rather than mixing two accounts' content in one folder.
+- **The sync API has one resource of its own.** The resource identifier is `${AUTH_CONFIG.URL}/api/sync`. It is what the plugin sends as `resource`, and it lands in the token's `aud` claim. Read and write share the one audience and are separated by the scopes `sync:read` and `sync:write`, so the plugin holds one token, not two. This settles T9.
+- **A shared workflow does not reach the vault.** `workflow_draft.project_id` is nullable, and a null means a workflow the owner reuses across projects. The PRD gives such a workflow no folder, so the sync API leaves those rows out. The vault mirrors what Papera's project sidebar shows.
+- **An unreadable project answers `404`, not `403`.** Papera has no sharing model, so a `403` would confirm that a guessed project id exists. `src/routes/api/projects/assets/$.ts` already answers `404`. Per-project failure isolation drops the project on either status code.
 - **A folder rename renames in Papera.** Renaming a project folder renames the project, and renaming a workflow folder renames the workflow. The plugin tells the person it reached Papera, because a folder rename in a vault does not usually leave the vault. It does not ask first: a rename is reversible, unlike a delete.
 
 Out of scope for every ticket: multi-vault mapping, one vault per project, real-time
@@ -89,10 +94,10 @@ entry once it is decided, and fold the answer into the ticket.
 | --- | --- | --- |
 | T7 | **Can Obsidian's attachment location be redirected per note?** If it cannot, the plugin moves a pasted file into the project's folder afterwards and rewrites the link. | PO-013 |
 | T8 | **Does Obsidian update inbound wikilinks when "Automatically update internal links" is off?** The rename path depends on Obsidian respelling its own links. A person who turned that setting off may see a stale wikilink after a rename in Papera. | PO-006, PO-014 |
-| T9 | **Which token audience does the sync API accept?** `auth.server.ts` sets `validAudiences: [MCP_RESOURCE_URL]`, which scopes every token to `/api/mcp`. The sync API needs its own audience, or it rejects every token the plugin holds. | PO-001, PO-003 |
+| T10 | **When does Papera upgrade Better Auth to 1.7.1?** `@better-auth/oauth-provider@1.6.24` does not bind a token's audience to its grant (GHSA-p2fr-6hmx-4528). Requiring the `sync:read` scope stops a client approved only for MCP from reaching the sync API. Only the upgrade stops a client approved for `sync:read` from minting an MCP token. The hole is open today and is not created by PO-001. This is a `slide-weaver` decision. | PO-001, PO-003 |
 
-None of these block PO-001 any more. T1, T2, T3 and T6 are decided and recorded in the
-shared decisions above.
+T1, T2, T3, T6 and T9 are decided and recorded in the shared decisions above. T10 does not
+block PO-001: the ticket ships with the `sync:read` scope and names the upgrade as open.
 
 ---
 
