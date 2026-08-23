@@ -25,7 +25,7 @@ application, not in this repository, as their **Repo** column says.
 | PO-009 | Sync write API in Papera | ⬜ **Pending** | slide-weaver | PO-001 | `tickets/PO-009-sync-write-api.md` |
 | PO-010 | Vault change detection and the push queue | ⬜ **Pending** | this | PO-006 | `tickets/PO-010-change-detection-and-queue.md` |
 | PO-011 | Push with conflict detection | ⬜ **Pending** | this | PO-009, PO-010, PO-014 | `tickets/PO-011-push-with-conflicts.md` |
-| PO-012 | Renames, moves and trash | ⬜ **Pending** | this | PO-011 | `tickets/PO-012-renames-moves-and-trash.md` |
+| PO-012 | Renames, moves and trash | ⬜ **Pending** | this | PO-009, PO-011 | `tickets/PO-012-renames-moves-and-trash.md` |
 | PO-013 | Push attachments | ⬜ **Pending** | this | PO-008, PO-011 | `tickets/PO-013-push-attachments.md` |
 
 PO-002 through PO-008 and PO-014 ship Phase 1. PO-009 through PO-013 ship Phase 2.
@@ -57,6 +57,7 @@ These hold across every ticket. Do not re-open them in a plan.
 - **Block ids do not survive Markdown.** `markdownToContent` regenerates them, by its own design. Papera re-attaches the stored ids on write; the plugin never carries them.
 - **Media has its own endpoint.** One endpoint lists everything one project holds, which is the single read `project_media` is indexed for. The content listing carries no attachment data.
 - **One vault, one Papera account.** The reserved root holds one account's projects. The index records which account the folder belongs to, so signing in as a different account is detected and refused rather than mixing two accounts' content in one folder.
+- **A folder rename renames in Papera.** Renaming a project folder renames the project, and renaming a workflow folder renames the workflow. The plugin tells the person it reached Papera, because a folder rename in a vault does not usually leave the vault. It does not ask first: a rename is reversible, unlike a delete.
 
 Out of scope for every ticket: multi-vault mapping, one vault per project, real-time
 collaboration, and Obsidian Publish integration.
@@ -101,6 +102,5 @@ These are product questions, and they live in `prd.md` section 8. They are liste
 because tickets wait on them. The question text stays in the PRD; this table only records
 what each one holds up.
 
-| PRD question | Blocks |
-| --- | --- |
-| What happens when a person renames a project folder or a workflow folder by hand? | PO-012 |
+No product question is open. Every decision is recorded in `prd.md` and in the shared
+decisions above.

@@ -28,7 +28,11 @@ this case must reach the delete path in PO-011 rather than being swallowed as a 
 - [ ] Case (b) — a note moves out of the reserved root: the plugin drops it from `.papera-index.json` and deletes nothing in Papera.
 - [ ] Case (c) — a note is renamed into `.trash/`: the plugin treats it as a delete, not as case (b).
 - [ ] A note moved back into a project folder with its `papera_id` intact is adopted again, and is not created twice.
-- [ ] A folder rename by the user inside the reserved root behaves as `prd.md` section 8 decides, under "What happens when a person renames a folder by hand?".
+- [ ] Renaming a project folder renames the project in Papera, and the plugin tells the user that the rename reached Papera.
+- [ ] Renaming a workflow folder renames the workflow in Papera, with the same notice.
+- [ ] A folder rename does not ask for confirmation, because a rename is reversible.
+- [ ] A folder renamed to a name Papera cannot hold is reported, and the folder is returned to its previous name.
+- [ ] The person is told when the name they typed differs from the name Papera stored, because the folder name is a sanitized form.
 - [ ] Every case above is written into `.clean-architecture/design.md`.
 
 ## Implementation Steps
@@ -45,6 +49,8 @@ this case must reach the delete path in PO-011 rather than being swallowed as a 
 ## Decisions
 
 - **A workflow moves, a note does not.** A workflow belongs to a project as a unit, and moving one is a single column update in Papera. A note belongs to the work it was written for, and moving it between workflows would rewrite Papera's graph.
+- **A folder rename reaches Papera, and says so.** Renaming a folder in a vault does not usually leave the vault, so the plugin tells the person it did. It does not ask first: a project rename is reversible, unlike a delete.
+- **A rename replaces the Papera name with what the person typed.** The folder name is a sanitized form of the Papera name, so a name holding a character a folder cannot carry loses it on the way back. The plugin reports the difference rather than hiding it.
 - **Trash is checked before scope.** `.trash/` sits outside the reserved root, so the case (c) check must run first or case (b) swallows it.
 - **A move out of the reserved root never deletes.** The user took the note out of sync. Deleting their content unit for that would be destructive and surprising.
 
@@ -60,6 +66,8 @@ this case must reach the delete path in PO-011 rather than being swallowed as a 
 - **Unit**: the classifier for a same-folder rename, a workflow folder moved between projects, a note moved between workflow folders, a move out of the reserved root, a rename into `.trash/`, and a move back in.
 - **E2E**: delete a synced note through Obsidian's trash and confirm Papera deletes the content unit.
 - **Manual**:
+  - [ ] Rename a project folder and confirm the project renames in Papera.
+  - [ ] Rename a project in Papera to a name holding `/`, rename the folder in the vault, and confirm the reported difference.
   - [ ] Move a workflow folder between two projects.
   - [ ] Move a note between two workflow folders and confirm it is returned.
   - [ ] Move a note out of the reserved root and confirm Papera still holds it.

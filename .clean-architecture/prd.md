@@ -144,7 +144,9 @@ A note's identity travels inside the note itself, in a short block at the top. T
 what makes a note the same note across a rename, a move, and a reinstall. The file name is a
 title, not an identity.
 
-Renaming a synced note therefore retitles it in Papera. Moving a whole piece of work from one
+Renaming a synced note therefore retitles it in Papera. Renaming a project folder or a
+folder holding a piece of work renames that thing in Papera too, and the plugin says so,
+because renaming a folder in a vault does not usually reach beyond the vault. Moving a whole piece of work from one
 project to another moves it between those projects, because a piece of work belongs to a
 project as a unit. A single note belongs to the work it was written for, so the plugin returns
 a note dragged out of that group and explains why. Moving a note out of the Papera folder
@@ -208,4 +210,4 @@ it was granted.
 
 ## 8. Open questions
 
-- **What happens when a person renames a folder by hand?** A folder in the vault carries the name of a project or of a piece of work. The person can rename it like any other folder. The product must decide whether that renames the thing in Papera, or whether the next sync restores the name.
+None open. Every product decision this document depends on is settled.

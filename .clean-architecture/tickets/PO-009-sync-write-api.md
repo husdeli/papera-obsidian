@@ -21,6 +21,8 @@ stale, so a concurrent edit in the Papera editor is never lost.
 - [ ] The write carries the revision the caller last read, and the endpoint rejects a stale one with `409`.
 - [ ] A successful write returns the new revision.
 - [ ] An authenticated caller renames a content unit title without changing its body.
+- [ ] An authenticated caller renames a project.
+- [ ] An authenticated caller renames a workflow.
 - [ ] An authenticated caller creates a content unit in a project.
 - [ ] An authenticated caller deletes a content unit.
 - [ ] The endpoint moves a whole workflow between two projects.
@@ -36,9 +38,10 @@ stale, so a concurrent edit in the Papera editor is never lost.
 2. **Revision check**: the write compares the caller's revision against the stored one, and answers `409` on a mismatch.
 3. **Write**: the endpoint converts the Markdown through `markdownToContent` and stores the result.
 4. **Block ids**: `markdownToContent` regenerates ids by design, so the endpoint re-attaches the stored ids after conversion. The plugin never carries an id.
-5. **Title**: a separate endpoint changes the title alone.
-6. **Create and delete**: the endpoints add and remove a content unit in a project.
-7. **Move**: a workflow moves between projects by updating `workflow_draft.projectId`, which is a plain column. Moving one content unit between workflows would change the composite key `(workflow_id, lifecycle, node_id)` and every edge pointing at it, so the endpoint refuses it.
+5. **Title**: a separate endpoint changes a content unit's title alone.
+6. **Names**: separate endpoints rename a project and a workflow.
+7. **Create and delete**: the endpoints add and remove a content unit in a workflow.
+8. **Move**: a workflow moves between projects by updating `workflow_draft.projectId`, which is a plain column. Moving one content unit between workflows would change the composite key `(workflow_id, lifecycle, node_id)` and every edge pointing at it, so the endpoint refuses it.
 
 ## Decisions
 
