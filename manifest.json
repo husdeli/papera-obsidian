@@ -1,0 +1,10 @@
+{
+	"id": "papera",
+	"name": "Papera",
+	"version": "0.1.0",
+	"minAppVersion": "1.13.0",
+	"description": "Syncs your Papera projects into a folder of Markdown notes in your vault.",
+	"author": "Dzmitry Karaleu",
+	"authorUrl": "https://github.com/husdeli/papera-obsidian",
+	"isDesktopOnly": false
+}
