@@ -16,7 +16,7 @@ as far as the ticket and the decisions, and stops there.
 | ID | Task | Status | Repo | Depends on | Ticket |
 | --- | --- | --- | --- | --- | --- |
 | PO-001 | Sync read API in Papera | ⬜ **Pending** | slide-weaver | — | `tickets/PO-001-sync-read-api.md` |
-| PO-002 | Plugin skeleton and mobile-safe HTTP | ⬜ **Pending** | this | — | `tickets/PO-002-plugin-skeleton.md` |
+| PO-002 | Plugin skeleton and mobile-safe HTTP | ✅ **Completed** | this | — | `tickets/PO-002-plugin-skeleton.md` |
 | PO-003 | OAuth sign-in and token refresh | ⬜ **Pending** | this | PO-002 | `tickets/PO-003-oauth-sign-in.md` |
 | PO-004 | Reserved root, name safety and the vault index | ⬜ **Pending** | this | PO-002 | `tickets/PO-004-reserved-root-and-index.md` |
 | PO-005 | Link translation design pass | ⬜ **Pending** | this | PO-001 | `tickets/PO-005-link-translation-design.md` |

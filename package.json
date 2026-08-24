@@ -1,0 +1,28 @@
+{
+	"name": "papera-obsidian",
+	"version": "0.1.0",
+	"description": "Papera for Obsidian — keeps Papera projects and an Obsidian vault in step",
+	"main": "main.js",
+	"type": "module",
+	"scripts": {
+		"dev": "tsx esbuild.config.ts",
+		"build": "npm run typecheck && tsx esbuild.config.ts production && tsx scripts/checkBundle.ts",
+		"typecheck": "tsc --noEmit -p tsconfig.json && tsc --noEmit -p tsconfig.node.json",
+		"lint": "eslint . --max-warnings 0",
+		"test": "vitest run"
+	},
+	"keywords": [],
+	"license": "MIT",
+	"devDependencies": {
+		"@types/node": "^22.20.1",
+		"esbuild": "0.25.5",
+		"eslint": "^9.39.5",
+		"eslint-plugin-obsidianmd": "^0.4.1",
+		"jiti": "^2.7.0",
+		"obsidian": "~1.13.1",
+		"tsx": "^4.23.12",
+		"typescript": "~5.9.3",
+		"typescript-eslint": "^8.67.0",
+		"vitest": "^4.1.11"
+	}
+}
