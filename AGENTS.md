@@ -9,6 +9,7 @@ root folder in a single vault. The product decisions live in `.clean-architectur
 - `src/config/` — the values that change per environment, in `.config.ts` modules.
 - `src/models/` — the typed shapes every layer names. This layer imports nothing.
 - `src/services/` — the modules that talk to the outside world.
+- `src/ui/` — the settings tab Obsidian renders.
 - `scripts/` — the build checks.
 - `test/` — the unit tests. The folders mirror the folders they cover.
 
@@ -25,6 +26,13 @@ a file needs it, and not before.
   It builds no file path, because Obsidian owns `data.json`.
 - The settings store checks the type of every saved field, because `loadData()` returns `any`.
   A field that fails the check falls back to its default.
+- The settings store owns the settings in memory. Every writer changes one field through
+  `PaperaSettingsStore.update`, and no other module builds a whole `PaperaSettings`. Two writers
+  of `data.json` can restore a revoked refresh token and sign the vault out.
+- `src/services/PaperaSession.ts` is the only module that holds a Papera token. It refreshes one
+  token at a time, and it reads and writes no vault file.
+- `src/services/paperaAuthorizedHttpClient.ts` is the only module that writes an `Authorization`
+  header. Every Papera request goes through it, and the caller writes no header of its own.
 - Every subscription goes through `registerEvent`, `registerDomEvent` or `registerInterval`,
   so Obsidian detaches it on unload.
 - `esbuild.config.ts` is the only file that reads `process.env`.
@@ -39,7 +47,5 @@ A Node built-in in the bundle breaks the plugin on mobile. Three checks stand in
 
 ## Deferrals
 
-- The Papera origin in `src/config/papera.config.ts` is a placeholder. PO-003 confirms the value
-  when it adds OAuth sign-in.
 - The release workflow and the submission to the community plugin list belong to a later ticket.
   The version stays `0.1.0` until then.

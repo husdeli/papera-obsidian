@@ -4,6 +4,7 @@ import { PaperaHttpError } from '../models/PaperaHttpError';
 export interface PaperaHttpRequest {
 	url: string;
 	method?: string;
+	contentType?: string;
 	headers?: Record<string, string>;
 	body?: string;
 }

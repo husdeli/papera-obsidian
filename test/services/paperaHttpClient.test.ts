@@ -87,6 +87,25 @@ describe('paperaHttpClient', () => {
 		});
 	});
 
+	it('passes the content type through to requestUrl', async () => {
+		vi.mocked(requestUrl).mockResolvedValue(responseWith(200, '{}'));
+
+		await paperaHttpClient.requestJson({
+			url: 'https://papera.dev/oauth2/token',
+			method: 'POST',
+			contentType: 'application/x-www-form-urlencoded',
+			body: 'grant_type=refresh_token',
+		});
+
+		expect(vi.mocked(requestUrl)).toHaveBeenCalledWith({
+			url: 'https://papera.dev/oauth2/token',
+			method: 'POST',
+			contentType: 'application/x-www-form-urlencoded',
+			body: 'grant_type=refresh_token',
+			throw: false,
+		});
+	});
+
 	it('raises PaperaHttpError for a failing request', async () => {
 		vi.mocked(requestUrl).mockResolvedValue(responseWith(404, 'not found'));
 

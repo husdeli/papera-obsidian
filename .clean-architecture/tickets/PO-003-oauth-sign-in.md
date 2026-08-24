@@ -1,6 +1,6 @@
 # [PO-003] OAuth sign-in and token refresh
 
-**Status**: Not Started
+**Status**: Completed
 **Priority**: Critical
 **Effort**: M
 **Category**: feature
@@ -31,14 +31,15 @@ can read that file. This is why the access token is short-lived.
 - [ ] The plugin records which Papera account the vault is signed in as.
 - [ ] Signing in as a second account, while the reserved root holds another account's notes, is refused with an explanation.
 - [ ] The refusal leaves every synced note in place and does not clear the first account's tokens.
-- [ ] A failed refresh puts the plugin in a signed-out state and deletes no vault file.
+- [ ] A refresh that Papera refuses puts the plugin in a signed-out state. A refresh that fails
+      on the network leaves the tokens in place. Neither deletes a vault file.
 - [ ] "Sign out" clears both tokens and deletes no vault file.
 - [ ] The HTTP client from PO-002 attaches the access token to every Papera request.
 
 ## Implementation Steps
 
 1. **Discovery**: the plugin reads `/.well-known/oauth-authorization-server` to find the authorize and token endpoints.
-2. **Client registration**: Papera recognises the plugin as an OAuth client. Open question T4 in `roadmap.md` decides between a pre-registered client id and dynamic client registration.
+2. **Client registration**: the plugin registers itself at `/oauth2/register` the first time a person signs in, and stores the returned `client_id` in `data.json`.
 3. **Authorization**: the plugin generates a PKCE verifier and a state value, then opens the authorization URL in the browser.
 4. **Callback**: the protocol handler receives the code, checks the state, and exchanges the code for tokens.
 5. **Refresh**: the HTTP client refreshes the access token when it expires, and retries the request once.
@@ -50,6 +51,27 @@ can read that file. This is why the access token is short-lived.
 - **Short-lived access token with refresh**: `data.json` is plaintext, so a leaked access token expires quickly. Papera already stores refresh tokens in `oauth_refresh_token`.
 - **A sign-out never deletes notes**: losing a token is not the same as unsyncing a project. PO-007 owns unsyncing.
 - **One vault, one Papera account**: mixing two accounts in one folder would make every note's ownership ambiguous. The plugin detects the second account and refuses rather than merging.
+
+### Interview decisions (2026-08-24)
+
+- **One OAuth client per vault.** The plugin registers itself at `/oauth2/register` on the first sign-in and keeps the returned `client_id` in `data.json`. Papera already sets `allowDynamicClientRegistration: true` and `allowUnauthenticatedClientRegistration: true`, so `slide-weaver` needs no change. This makes the PRD's "granted per vault and withdrawn per vault" literally true: withdrawing one vault leaves the person's other vaults signed in. A pre-registered client id would make Papera's grant per `(client, user)`, so one withdrawal would cut off every vault that person owns. This settles the open question the old implementation step 2 named.
+- **The account id lives in `data.json` for now.** PO-003 stores the Papera account id beside the tokens. PO-004 adds the durable record in `.papera-index.json`, and the sign-in check prefers the index when it exists. No synced note can exist before PO-004 and PO-006 ship, so a plugin reinstall cannot orphan a note before the index exists. PO-003 therefore reads and writes no vault file. **PO-004 gains one acceptance criterion: the second-account refusal reads the account recorded in the index.**
+- **The plugin requests `sync:read` and `offline_access` only.** Phase 1 is a read-only pull, so the consent screen asks for read access only. `offline_access` is what makes Papera issue a refresh token. PO-011 sends the person through the consent screen a second time to add `sync:write`.
+- **The Papera origin is `https://papera.dev`.** This replaces the unverified `https://papera.app` placeholder in `src/config/papera.config.ts` and closes its `TODO`. The existing `baseUrl` setting still lets a vault point at a local `slide-weaver` run for testing.
+
+### Confirmed assumptions
+
+- The plugin sends `resource=${baseUrl}/api/sync` on the code exchange and on every refresh. `@better-auth/oauth-provider@1.6.24` issues a JWT access token only when the token request carries `resource`; without it the token is opaque and carries no `aud` and no `sub`.
+- The plugin reads the account id from the `sub` claim of the JWT access token. It requests no `openid` scope, so the refusal message names no email address.
+- The plugin keeps the PKCE verifier and the `state` value in `data.json` until the callback arrives, because Obsidian on a phone can be killed while the person is in the browser. It clears both after use.
+- Refresh is single-flight, and the rotated refresh token reaches `data.json` before the new access token is used. Papera revokes the whole token family when a revoked refresh token is presented again, so a second concurrent refresh would sign the vault out.
+- A new authenticated service owns the token and adds the `Authorization` header, then delegates to `paperaHttpClient`. The HTTP client keeps the `AGENTS.md` rule that it reads no settings and holds no base URL.
+- "Sign out" calls `/oauth2/revoke` and then clears the tokens. A failed revoke still clears them.
+- "Sign in" and "Sign out" live in a plugin settings tab that PO-007 later extends. `design.md` specifies no surface, so the plan chooses the wording.
+
+### Known limit
+
+A live end-to-end sign-in cannot succeed until `slide-weaver` accepts the sync resource and the `sync:read` scope. Papera's `validAudiences` lists only the MCP resource today, and it passes no `scopes` option, so the token request answers `400 invalid_request` and the authorize request answers `invalid_scope`. PO-001 owns both changes. A local `slide-weaver` run with them added verifies PO-003.
 
 ## Technical Notes
 
@@ -81,3 +103,5 @@ can read that file. This is why the access token is short-lived.
 ## Iteration Log
 
 - **Iteration 1 (2026-08-23)**: Split out of the original single ticket.
+- **Iteration 2 (2026-08-24)**: Feature interview run. Four decisions recorded: one OAuth client per vault, the account id in `data.json`, the scopes `sync:read` and `offline_access`, and the origin `https://papera.dev`.
+- **Iteration 3 (2026-08-24)**: The failed-refresh criterion is narrowed. It first said that any failed refresh signs the vault out. Only a refusal from Papera does that now. A lost network must not destroy a session, so a transport failure and a `5xx` answer leave the tokens in place.

@@ -1,16 +1,33 @@
 import type { Plugin } from 'obsidian';
 import { paperaConfig } from '../config/papera.config';
-import type { PaperaSettings } from '../models/paperaSettings';
+import type { PaperaPendingSignIn, PaperaSettings } from '../models/paperaSettings';
 
 export class PaperaSettingsStore {
+	private static owned: PaperaSettings | undefined;
+
 	static async load(plugin: Plugin): Promise<PaperaSettings> {
 		const saved: unknown = await plugin.loadData();
 
-		return PaperaSettingsStore.fromSaved(saved);
+		PaperaSettingsStore.owned = PaperaSettingsStore.fromSaved(saved);
+
+		return PaperaSettingsStore.owned;
 	}
 
-	static async save(plugin: Plugin, settings: PaperaSettings): Promise<void> {
-		await plugin.saveData(settings);
+	static current(): PaperaSettings {
+		if (PaperaSettingsStore.owned === undefined) {
+			throw new Error('The Papera settings are read before they are loaded.');
+		}
+
+		return PaperaSettingsStore.owned;
+	}
+
+	static async update(plugin: Plugin, change: Partial<PaperaSettings>): Promise<PaperaSettings> {
+		const updated = { ...PaperaSettingsStore.current(), ...change };
+
+		PaperaSettingsStore.owned = updated;
+		await plugin.saveData(updated);
+
+		return updated;
 	}
 
 	private static fromSaved(saved: unknown): PaperaSettings {
@@ -21,6 +38,12 @@ export class PaperaSettingsStore {
 				fields.baseUrl,
 				paperaConfig.defaultSettings.baseUrl,
 			),
+			clientId: PaperaSettingsStore.asOptionalString(fields.clientId),
+			accessToken: PaperaSettingsStore.asOptionalString(fields.accessToken),
+			refreshToken: PaperaSettingsStore.asOptionalString(fields.refreshToken),
+			accessTokenExpiresAt: PaperaSettingsStore.asOptionalNumber(fields.accessTokenExpiresAt),
+			accountId: PaperaSettingsStore.asOptionalString(fields.accountId),
+			pendingSignIn: PaperaSettingsStore.asPendingSignIn(fields.pendingSignIn),
 		};
 	}
 
@@ -34,5 +57,26 @@ export class PaperaSettingsStore {
 
 	private static asString(value: unknown, fallback: string): string {
 		return typeof value === 'string' ? value : fallback;
+	}
+
+	private static asOptionalString(value: unknown): string | undefined {
+		return typeof value === 'string' ? value : undefined;
+	}
+
+	private static asOptionalNumber(value: unknown): number | undefined {
+		return typeof value === 'number' && Number.isFinite(value) ? value : undefined;
+	}
+
+	private static asPendingSignIn(value: unknown): PaperaPendingSignIn | undefined {
+		const fields = PaperaSettingsStore.asRecord(value);
+		const state = PaperaSettingsStore.asOptionalString(fields.state);
+		const codeVerifier = PaperaSettingsStore.asOptionalString(fields.codeVerifier);
+		const createdAt = PaperaSettingsStore.asOptionalNumber(fields.createdAt);
+
+		if (state === undefined || codeVerifier === undefined || createdAt === undefined) {
+			return undefined;
+		}
+
+		return { state, codeVerifier, createdAt };
 	}
 }
