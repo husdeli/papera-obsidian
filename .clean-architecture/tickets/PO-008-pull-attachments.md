@@ -11,16 +11,13 @@
 Pull each project's media into an `attachments/` folder inside that project's folder, so
 that an image in a Papera content unit renders in Obsidian.
 
-Papera stores media in `project_media`, keyed by `projects/<ownerId>/<projectId>/<path>`,
-and `src/routes/api/projects/assets/$.ts` streams the bytes. That route authenticates by
-session cookie today. The plugin has no cookie, so the route must also accept a bearer
-token.
+Papera holds media per project, lists it on an endpoint of its own, and streams the bytes
+from a second endpoint.
 
 ## Acceptance Criteria
 
 - [ ] Each synced project folder holds an `attachments/` folder.
 - [ ] Every media file the project's synced content units reference is pulled into that folder.
-- [ ] The asset route in Papera accepts the plugin's bearer token.
 - [ ] An image link in a pulled note resolves to the local attachment and renders in Obsidian.
 - [ ] `.papera-index.json` maps each storage key to its vault path.
 - [ ] A second pull does not download a file that is already present and unchanged.
@@ -30,32 +27,30 @@ token.
 
 ## Implementation Steps
 
-1. **Bearer auth on the asset route**: `src/routes/api/projects/assets/$.ts` in `~/Projects/slide-weaver` accepts a bearer token in addition to the session cookie.
-2. **Media list**: one endpoint lists the media a project holds, separate from the content listing.
-3. **Download**: the plugin writes each file into the project's `attachments/` folder through the vault API.
-4. **Link rewriting**: an image reference in a pulled note points at the local attachment, under the PO-005 rules.
-5. **Change detection**: the index records what was downloaded, so a repeat pull skips it.
+1. **Media list**: the plugin reads the media listing for each synced project.
+2. **Download**: the plugin writes each file into the project's `attachments/` folder through the vault API.
+3. **Link rewriting**: an image reference in a pulled note points at the local attachment, under the PO-005 rules.
+4. **Change detection**: the index records what was downloaded, so a repeat pull skips it.
 
 ## Decisions
 
 - **One `attachments/` folder per project**, not one shared folder. A project unsyncs as a unit, and its media must go with it.
-- **Media has its own endpoint.** `project_media` is indexed on `(owner_id, project_id)` for exactly this read. Putting media into the content listing would make every content read carry data it does not need.
 
 ## Technical Notes
 
 ### Data Requirements
 
-- `project_media` records `storage_key`, `file_name`, `content_type` and `size_in_bytes`.
+- The media listing gives each file a storage key, a file name, a content type and a size. A storage key is minted once per upload, and the bytes under it never change, so a key the plugin already holds needs no second download.
 
 ### Architectural Considerations
 
-- **The asset route answers `404`, not `403`, for anything the caller may not read.** That is deliberate, so it is not an oracle for which assets exist. The plugin must not read a `404` here as "the file is gone" without checking the media list first.
+- **The download endpoint answers `404` for anything the caller may not read.** That is deliberate, so it is not an oracle for which assets exist. The plugin must not read a `404` here as "the file is gone" without checking the media list first.
 - **Binary writes go through the vault's binary API**, not through a string write.
 
 ## Testing
 
 - **Unit**: the storage key to vault path mapping; the skip-if-unchanged check.
-- **API**: the asset route with a bearer token, with a cookie, and with neither.
+- **API**: the media listing and one download, each with a valid token and with none.
 - **Manual**:
   - [ ] Pull a project with images and confirm they render in Obsidian.
   - [ ] Pull attachments on mobile.
@@ -69,3 +64,4 @@ token.
 ## Iteration Log
 
 - **Iteration 1 (2026-08-23)**: Split out of the original single ticket.
+- **Iteration 2 (2026-08-25)**: The requirements on the Papera application moved out of this ticket. They are specified with Papera, and this ticket states none of them.

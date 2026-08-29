@@ -6,6 +6,7 @@ export interface PaperaPendingSignIn {
 
 export interface PaperaSettings {
 	baseUrl: string;
+	reservedRoot: string;
 	clientId?: string;
 	accessToken?: string;
 	refreshToken?: string;

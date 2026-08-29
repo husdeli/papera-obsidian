@@ -17,13 +17,13 @@ leaves both versions intact.
 
 ## Acceptance Criteria
 
-- [ ] A queued change pushes the note body to Papera through the PO-009 write endpoint.
+- [ ] A queued change pushes the note body to Papera through the sync API's write endpoint.
 - [ ] The push sends the `papera_rev` from the note's frontmatter.
 - [ ] A successful push writes the new revision and `updated_at` back into the frontmatter.
 - [ ] The frontmatter write does not itself queue another push.
 - [ ] A `409` writes `<note> (conflict <date>).md` next to the note, holding the version from Papera.
 - [ ] The original note keeps the user's local text, unchanged.
-- [ ] A conflict file carries no `papera_id`, so it never syncs and never pushes.
+- [ ] A conflict file carries no `papera_id`, so it never syncs and never pushes. Two files under one workflow folder must never carry one `papera_id` that the plugin acts on: the PO-004 map keeps the shorter vault path and drops the other.
 - [ ] The plugin tells the user a conflict happened, and names the note.
 - [ ] Links translate from wikilinks to Papera links through the PO-014 module before the push.
 - [ ] A note whose translated body matches what Papera already holds sends nothing.
@@ -31,7 +31,7 @@ leaves both versions intact.
 - [ ] A `403` on one note does not stop the queue.
 - [ ] A note created by hand under a project folder creates a content unit in Papera, and gains a `papera_id`.
 - [ ] A note deleted under a project folder deletes the content unit in Papera, after the plugin names the note and the person confirms.
-- [ ] Declining the confirmation leaves the content unit in Papera and takes the note out of the index.
+- [ ] Declining the confirmation leaves the content unit in Papera and takes the note out of the in-memory map.
 - [ ] A note holding bold, italic or inline code is held back from the push, and the plugin tells the person that Papera carries plain text and links.
 - [ ] A note held back keeps the person's text exactly as they wrote it, and the plugin never removes the emphasis on their behalf.
 - [ ] The plugin offers to remove the emphasis and send, so a held note is not stuck.
@@ -39,7 +39,7 @@ leaves both versions intact.
 ## Implementation Steps
 
 1. **Push a change**: the queue worker reads the note, translates its links through the PO-014 module, and calls the write endpoint. This ticket holds no translation logic of its own.
-2. **Record the result**: a successful push writes the new revision into the frontmatter and into the index.
+2. **Record the result**: a successful push writes the new revision into the frontmatter and into the in-memory map. The frontmatter is what survives a restart; the map is rebuilt from it.
 3. **Detect a conflict**: a `409` triggers the conflict path.
 4. **Write the conflict file**: the plugin fetches the Papera version and writes it to `<note> (conflict <date>).md`, with no `papera_id`.
 5. **Report**: the plugin names every conflicted note to the user.
@@ -59,7 +59,7 @@ leaves both versions intact.
 
 - **A delete asks first.** Deleting a file is a light gesture and removing a content unit is not, so the plugin names the note and waits for a yes.
 - **Emphasis is held, never stripped silently.** Papera's content model carries plain text and links, with no bold, italic or inline code. Flattening a person's formatting without telling them would break the product's own promise that nothing is lost quietly.
-- **A create needs a target project.** The note's folder names it, through the index.
+- **A create needs a target project.** The note's folder names it, through the in-memory map.
 
 ## Testing
 
@@ -72,10 +72,11 @@ leaves both versions intact.
 
 ## Related
 
-- Related Tickets: PO-009, PO-010, PO-014, PO-012
+- Related Tickets: PO-010, PO-014, PO-012
 
 ---
 
 ## Iteration Log
 
 - **Iteration 1 (2026-08-23)**: Split out of the original single ticket.
+- **Iteration 2 (2026-08-25)**: The requirements on the Papera application moved out of this ticket. They are specified with Papera, and this ticket states none of them.

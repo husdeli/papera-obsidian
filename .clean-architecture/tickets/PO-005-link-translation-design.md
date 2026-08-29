@@ -15,9 +15,9 @@ Link translation runs on every pull and every push, in both directions, and it r
 body of a user's note. A wrong rule corrupts content silently. That is why the rules are
 settled before PO-006 writes the first note.
 
-Papera has no internal link format. `LINK_NODE_SCHEMA` is `{ type: "link", text, href }`,
-so a link to another content unit is an ordinary URL. Translation is therefore a
-URL-matching problem.
+Papera has no internal link format. A link to another content unit is an ordinary URL, so
+translation is a URL-matching problem. The canonical URL of a content unit is decided with
+Papera, and it is the one answer this ticket waits on.
 
 ## Acceptance Criteria
 
@@ -35,7 +35,7 @@ URL-matching problem.
 
 ## Implementation Steps
 
-1. **Read the model**: read `LINK_NODE_SCHEMA` and `inlineToMarkdown` in `~/Projects/slide-weaver/src/features/content/domain/`.
+1. **Read the model**: get the canonical URL of a content unit, and the URL of an image, from the sync API Papera serves.
 2. **Collect the URL forms**: list the Papera URL forms that address a content unit, a project and an asset.
 3. **Write the pull rules**: specify Papera link to wikilink.
 4. **Write the push rules**: specify wikilink to Papera link.
@@ -71,3 +71,4 @@ URL-matching problem.
 ## Iteration Log
 
 - **Iteration 1 (2026-08-23)**: Split out of the original single ticket, as item 10 of the feature brief asked.
+- **Iteration 2 (2026-08-25)**: The requirements on the Papera application moved out of this ticket. They are specified with Papera, and this ticket states none of them.

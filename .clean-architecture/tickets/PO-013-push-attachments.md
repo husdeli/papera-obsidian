@@ -26,7 +26,7 @@ pasted into a note in Obsidian appears in the Papera content unit.
 ## Implementation Steps
 
 1. **Attachment folder setting**: the plugin points Obsidian's attachment location at the project's `attachments/` folder for a synced note.
-2. **Upload**: a new file in `attachments/` uploads through Papera's asset upload endpoint.
+2. **Upload**: a new file in `attachments/` uploads through Papera's upload endpoint.
 3. **Delete and rename**: the plugin maps a vault change to the matching media change.
 4. **Limits**: the plugin reads the ceiling errors and tells the user plainly.
 5. **Queue**: attachment work joins the PO-010 queue, so the cap covers it.
@@ -39,7 +39,7 @@ pasted into a note in Obsidian appears in the Papera content unit.
 
 ### Data Requirements
 
-- `project_media` records `size_in_bytes`, and Papera sums it for the per-account storage ceiling. The per-file ceiling is 100 MB.
+- Papera holds two ceilings and answers `402` when either is reached: 100 MB for one file, and a storage total for the account. The plugin shows the message Papera returns and does not retry.
 
 ### Architectural Considerations
 
@@ -64,3 +64,4 @@ pasted into a note in Obsidian appears in the Papera content unit.
 ## Iteration Log
 
 - **Iteration 1 (2026-08-23)**: Split out of the original single ticket.
+- **Iteration 2 (2026-08-25)**: The requirements on the Papera application moved out of this ticket. They are specified with Papera, and this ticket states none of them.

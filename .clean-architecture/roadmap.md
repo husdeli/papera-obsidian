@@ -1,6 +1,6 @@
 # Papera for Obsidian — roadmap
 
-**Last updated**: 2026-08-23
+**Last updated**: 2026-08-25
 
 Status values: ⬜ **Pending** · 🚧 **In Progress** · ✅ **Completed** · 🚫 **Blocked**
 
@@ -8,38 +8,40 @@ The plugin syncs Papera projects into one reserved root folder in a single Obsid
 Phase 1 ships a read-only pull. Phase 2 adds write-back. A failed write costs the user work
 that a failed read does not.
 
-Nothing is blocked. PO-001 is the first task. It and PO-009 are built in the Papera
-application, not in this repository, as their **Repo** column says. **Their code is
-written in the `slide-weaver` repository, never from this one.** Work on them here goes
-as far as the ticket and the decisions, and stops there.
+**Every task below is built in this repository.** The **Needs from Papera** column names
+what a task waits on from Papera, by the numbers in `sync-requirements.md`. How Papera
+meets a need is decided and built with the Papera application, not here.
 
-| ID | Task | Status | Repo | Depends on | Ticket |
+Nothing is blocked. PO-004 is the first task.
+
+| ID | Task | Status | Depends on | Needs from Papera | Ticket |
 | --- | --- | --- | --- | --- | --- |
-| PO-001 | Sync read API in Papera | ⬜ **Pending** | slide-weaver | — | `tickets/PO-001-sync-read-api.md` |
-| PO-002 | Plugin skeleton and mobile-safe HTTP | ✅ **Completed** | this | — | `tickets/PO-002-plugin-skeleton.md` |
-| PO-003 | OAuth sign-in and token refresh | ✅ **Completed** | this | PO-002 | `tickets/PO-003-oauth-sign-in.md` |
-| PO-004 | Reserved root, name safety and the vault index | ⬜ **Pending** | this | PO-002 | `tickets/PO-004-reserved-root-and-index.md` |
-| PO-005 | Link translation design pass | ⬜ **Pending** | this | PO-001 | `tickets/PO-005-link-translation-design.md` |
-| PO-014 | Link translation, both directions | ⬜ **Pending** | this | PO-004, PO-005 | `tickets/PO-014-link-translation.md` |
-| PO-006 | Pull projects and content units | ⬜ **Pending** | this | PO-001, PO-003, PO-004, PO-014 | `tickets/PO-006-pull-content.md` |
-| PO-007 | Selective sync settings tab | ⬜ **Pending** | this | PO-006 | `tickets/PO-007-selective-sync-settings.md` |
-| PO-008 | Pull attachments | ⬜ **Pending** | this | PO-006 | `tickets/PO-008-pull-attachments.md` |
-| PO-009 | Sync write API in Papera | ⬜ **Pending** | slide-weaver | PO-001 | `tickets/PO-009-sync-write-api.md` |
-| PO-010 | Vault change detection and the push queue | ⬜ **Pending** | this | PO-006 | `tickets/PO-010-change-detection-and-queue.md` |
-| PO-011 | Push with conflict detection | ⬜ **Pending** | this | PO-009, PO-010, PO-014 | `tickets/PO-011-push-with-conflicts.md` |
-| PO-012 | Renames, moves and trash | ⬜ **Pending** | this | PO-009, PO-011 | `tickets/PO-012-renames-moves-and-trash.md` |
-| PO-013 | Push attachments | ⬜ **Pending** | this | PO-008, PO-011 | `tickets/PO-013-push-attachments.md` |
+| PO-002 | Plugin skeleton and mobile-safe HTTP | ✅ **Completed** | — | — | `tickets/PO-002-plugin-skeleton.md` |
+| PO-003 | OAuth sign-in and token refresh | ✅ **Completed** | PO-002 | R1–R7 | `tickets/PO-003-oauth-sign-in.md` |
+| PO-004 | Reserved root, name safety and the vault index | ✅ **Completed** | PO-002, PO-003 | — | `tickets/PO-004-reserved-root-and-index.md` |
+| PO-005 | Link translation design pass | ⬜ **Pending** | — | R36–R39 | `tickets/PO-005-link-translation-design.md` |
+| PO-014 | Link translation, both directions | ⬜ **Pending** | PO-004, PO-005 | — | `tickets/PO-014-link-translation.md` |
+| PO-006 | Pull projects and content units | ⬜ **Pending** | PO-003, PO-004, PO-014 | R8–R24, R46–R52 | `tickets/PO-006-pull-content.md` |
+| PO-007 | Selective sync settings tab | ⬜ **Pending** | PO-006 | — | `tickets/PO-007-selective-sync-settings.md` |
+| PO-008 | Pull attachments | ⬜ **Pending** | PO-006 | R40–R42 | `tickets/PO-008-pull-attachments.md` |
+| PO-010 | Vault change detection and the push queue | ⬜ **Pending** | PO-006 | — | `tickets/PO-010-change-detection-and-queue.md` |
+| PO-011 | Push with conflict detection | ⬜ **Pending** | PO-010, PO-014 | R25–R31 | `tickets/PO-011-push-with-conflicts.md` |
+| PO-012 | Renames, moves and trash | ⬜ **Pending** | PO-011 | R28, R32–R35 | `tickets/PO-012-renames-moves-and-trash.md` |
+| PO-013 | Push attachments | ⬜ **Pending** | PO-008, PO-011 | R43–R45 | `tickets/PO-013-push-attachments.md` |
 
-PO-002 through PO-008 and PO-014 ship Phase 1. PO-009 through PO-013 ship Phase 2.
+PO-002 through PO-008 and PO-014 ship Phase 1. PO-010 through PO-013 ship Phase 2.
 
 PO-014 is numbered last and ordered fifth. The table is ordered by dependency, not by
-number, so the existing tickets kept their identifiers when it was added.
+number, so the existing tickets kept their identifiers when it was added. PO-001 and PO-009
+were the Papera application's read API and write API. They moved to the Papera application
+on 2026-08-25, and their numbers are retired.
 
 ---
 
 ## Shared decisions
 
-These hold across every ticket. Do not re-open them in a plan.
+These hold across every ticket. Do not re-open them in a plan. They are decisions about the
+plugin. The decisions about the Papera application are recorded with Papera.
 
 - **One vault, one install.** All projects sync into one reserved root folder in one vault. An Obsidian vault is a real folder on disk, and a community plugin installs per vault.
 - **Reserved root folder.** The plugin manages only paths under the reserved root. Its name is a setting, default `Papera`.
@@ -50,18 +52,18 @@ These hold across every ticket. Do not re-open them in a plan.
 - **Token storage.** The access token lands in `data.json` in plaintext, so the plugin uses a short-lived access token with a refresh token.
 - **Per-project failure isolation.** A `403` on one project drops that project's folder from the sync and leaves the rest running.
 - **One subfolder per workflow.** A project folder holds one subfolder per workflow, and a workflow folder holds its notes. This mirrors Papera's real structure, and it is what makes a workflow folder movable between projects.
-- **Attachments stay at project level.** `project_media` is keyed by project, so a project folder holds one `attachments/` folder that its workflow folders share.
-- **A whole workflow moves; a single note does not.** `workflow_draft.projectId` is a plain column, so moving a workflow folder between projects is a one-column update. Moving one note between workflows would change the composite key `(workflow_id, lifecycle, node_id)` and every edge pointing at it, so the plugin reverses that move instead.
+- **Attachments stay at project level.** Papera holds media per project, so a project folder holds one `attachments/` folder that its workflow folders share.
+- **A whole workflow moves; a single note does not.** Moving a workflow folder between projects moves the workflow in Papera. Moving one note between workflows is not possible in Papera, so the plugin reverses that move instead.
 - **Emphasis is never dropped silently.** Papera's content model holds plain text and links, with no bold, italic or inline code. A note carrying emphasis is held back from the push, and the person is told. Their text is left exactly as they wrote it.
 - **A vault delete asks before it deletes in Papera.** Deleting a file is a light gesture and removing a content unit is not, so the plugin names the note and asks first.
 - **Unsyncing offers to send first.** When a project holding unsent edits is turned off, the plugin offers to push those edits before it removes the folder.
-- **Revision is a counter, not an ETag.** `content_units` gains a monotonic revision counter. An ETag over the serialized content would change whenever serialization changes, which would make every note look modified after a Papera deploy.
-- **Block ids do not survive Markdown.** `markdownToContent` regenerates them, by its own design. Papera re-attaches the stored ids on write; the plugin never carries them.
-- **Media has its own endpoint.** One endpoint lists everything one project holds, which is the single read `project_media` is indexed for. The content listing carries no attachment data.
+- **Revision is a counter, not an ETag.** The plugin stores the revision Papera returns as `papera_rev`, and sends it back on a push.
+- **The plugin carries no block id.** Markdown holds none, and Papera restores its own on a write.
+- **Attachments are listed apart from content.** The plugin reads one listing per project for its media, and a note listing carries no attachment data.
 - **One vault, one Papera account.** The reserved root holds one account's projects. The index records which account the folder belongs to, so signing in as a different account is detected and refused rather than mixing two accounts' content in one folder.
-- **The sync API has one resource of its own.** The resource identifier is `${AUTH_CONFIG.URL}/api/sync`. It is what the plugin sends as `resource`, and it lands in the token's `aud` claim. Read and write share the one audience and are separated by the scopes `sync:read` and `sync:write`, so the plugin holds one token, not two. This settles T9.
-- **A shared workflow does not reach the vault.** `workflow_draft.project_id` is nullable, and a null means a workflow the owner reuses across projects. The PRD gives such a workflow no folder, so the sync API leaves those rows out. The vault mirrors what Papera's project sidebar shows.
-- **An unreadable project answers `404`, not `403`.** Papera has no sharing model, so a `403` would confirm that a guessed project id exists. `src/routes/api/projects/assets/$.ts` already answers `404`. Per-project failure isolation drops the project on either status code.
+- **One token, two scopes.** The plugin sends `resource=<baseUrl>/api/sync` on every token request, and asks for `sync:read` in Phase 1 and `sync:write` in Phase 2. One resource means one token in `data.json`, not two.
+- **A shared workflow gets no folder.** A workflow the owner reuses across projects belongs to no project, and the vault mirrors what Papera's project sidebar shows.
+- **A project the plugin may not read answers `404` or `403`.** The plugin drops that project from the sync on either code, and keeps every other project running.
 - **A folder rename renames in Papera.** Renaming a project folder renames the project, and renaming a workflow folder renames the workflow. The plugin tells the person it reached Papera, because a folder rename in a vault does not usually leave the vault. It does not ask first: a rename is reversible, unlike a delete.
 
 Out of scope for every ticket: multi-vault mapping, one vault per project, real-time
@@ -69,35 +71,21 @@ collaboration, and Obsidian Publish integration.
 
 ---
 
-## Shared context — findings from the Papera source
-
-Read from `~/Projects/slide-weaver` on 2026-08-23. Tickets reference this section rather
-than repeating it.
-
-- **No read API exists.** `src/routes/api/` serves auth, billing, AI, socials, MCP and project assets. It serves no project list and no content read. The only programmatic content surface is the MCP tool set in `src/mcp/`. PO-001 builds the missing API.
-- **A content unit is not a direct child of a project.** The chain is project → workflow draft → node → content unit. `src/features/projects/domain/project-item.schema.ts` says a project holds items of kind `workflow` and `analytics`. `src/db/schema.server.ts` stores a content unit in `content_units` as `{ title, sections }`, keyed by `(workflow_id, lifecycle, node_id)`.
-- **`papera_rev` does not exist.** `content_units` carries no revision column. The `nodes` table carries `updated_at`.
-- **Markdown conversion already exists, server-side.** `src/features/content/domain/contentToMarkdown.ts` and `markdownToContent.ts` convert both ways. The sync API serves Markdown from these functions, so the plugin holds no second copy of the conversion rules.
-- **Markdown loses block ids.** A block carries a stable `id`, and `docs/content-node.md` says renderer back-sync depends on it. Markdown carries no block id.
-- **Papera has no internal link format.** `LINK_NODE_SCHEMA` in `src/features/content/domain/content.schema.ts` is `{ type: "link", text, href }`. A link to another content unit is an ordinary `href`.
-- **OAuth is already served.** `src/features/auth/auth.server.ts` runs `@better-auth/oauth-provider`. It issues JWT access tokens, stores refresh tokens in `oauth_refresh_token`, and Papera serves `/.well-known/oauth-authorization-server`.
-- **Attachments have a home.** `project_media` holds one row per file, keyed by `projects/<ownerId>/<projectId>/<path>`. `src/routes/api/projects/assets/$.ts` streams the bytes and checks the owner against the session. It answers `404`, not `403`, for anything the caller may not read.
-
----
-
 ## Open questions
 
-Technical decisions that are not settled. Each one names the tickets it blocks. Delete an
-entry once it is decided, and fold the answer into the ticket.
+Technical decisions about the plugin that are not settled. Each one names the tickets it
+blocks. Delete an entry once it is decided, and fold the answer into the ticket. The
+questions this plugin has for Papera are in `sync-requirements.md` section 6.
 
 | # | Question | Blocks |
 | --- | --- | --- |
 | T7 | **Can Obsidian's attachment location be redirected per note?** If it cannot, the plugin moves a pasted file into the project's folder afterwards and rewrites the link. | PO-013 |
 | T8 | **Does Obsidian update inbound wikilinks when "Automatically update internal links" is off?** The rename path depends on Obsidian respelling its own links. A person who turned that setting off may see a stale wikilink after a rename in Papera. | PO-006, PO-014 |
-| T10 | **When does Papera upgrade Better Auth to 1.7.1?** `@better-auth/oauth-provider@1.6.24` does not bind a token's audience to its grant (GHSA-p2fr-6hmx-4528). Requiring the `sync:read` scope stops a client approved only for MCP from reaching the sync API. Only the upgrade stops a client approved for `sync:read` from minting an MCP token. The hole is open today and is not created by PO-001. This is a `slide-weaver` decision. | PO-001, PO-003 |
+| T11 | **What happens when a person changes the reserved root folder name after a sync, or renames the reserved root folder in the vault?** PO-004 reads the setting once at load and moves no folder, so both cases leave the synced work behind under the old name. The work belongs to a later ticket. | No ticket yet |
 
-T1, T2, T3, T6 and T9 are decided and recorded in the shared decisions above. T10 does not
-block PO-001: the ticket ships with the `sync:read` scope and names the upgrade as open.
+T1, T2, T3, T6 and T9 are decided and recorded in the shared decisions above. T10 was a
+question about the Papera application. It moved there on 2026-08-25, and it blocks no
+ticket here.
 
 ---
 

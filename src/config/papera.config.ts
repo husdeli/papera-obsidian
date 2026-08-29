@@ -9,7 +9,9 @@ export const paperaConfig = {
 	clientName: 'Papera for Obsidian',
 	accessTokenSkewMs: 60_000,
 	pendingSignInLifetimeMs: 600_000,
+	mapBuildDelayMs: 5_000,
 	defaultSettings: {
 		baseUrl: PAPERA_ORIGIN,
+		reservedRoot: 'Papera',
 	},
 } as const;

@@ -15,6 +15,13 @@ const oauthClient = vi.hoisted(() => ({
 
 vi.mock('../../src/services/PaperaOAuthClient', () => ({ PaperaOAuthClient: oauthClient }));
 
+const vaultIndex = vi.hoisted(() => ({
+	accountId: vi.fn((): string | undefined => undefined),
+	recordAccount: vi.fn(() => Promise.resolve()),
+}));
+
+vi.mock('../../src/services/PaperaVaultIndex', () => ({ PaperaVaultIndex: vaultIndex }));
+
 vi.mock('../../src/services/PaperaPkce', () => ({
 	PaperaPkce: {
 		createCodeVerifier: vi.fn(() => 'verifier-1'),
@@ -71,6 +78,8 @@ function callbackOf(params: Record<string, string>): ObsidianProtocolData {
 describe('PaperaSession', () => {
 	beforeEach(() => {
 		forgetInFlightRefresh();
+		vaultIndex.accountId.mockReset().mockReturnValue(undefined);
+		vaultIndex.recordAccount.mockReset().mockResolvedValue(undefined);
 		saveEvents.length = 0;
 		for (const exchange of Object.values(oauthClient)) {
 			exchange.mockReset();
@@ -327,6 +336,35 @@ describe('PaperaSession', () => {
 				refreshToken: 'refresh-1',
 				accountId: 'account-1',
 			});
+			expect(vaultIndex.recordAccount).toHaveBeenCalledWith(asPlugin, 'account-1');
+		});
+
+		it('refuses a second Papera account against the account file', async () => {
+			const { asPlugin } = await signedInWith({
+				clientId: 'client-1',
+				pendingSignIn: {
+					state: 'state-1',
+					codeVerifier: 'verifier-1',
+					createdAt: Date.now(),
+				},
+			});
+
+			vaultIndex.accountId.mockReturnValue('account-1');
+			oauthClient.exchangeCode.mockResolvedValue({
+				accessToken: accessTokenFor('account-2'),
+				refreshToken: 'refresh-2',
+				accessTokenExpiresAt: Date.now() + AN_HOUR_MS,
+			});
+
+			await expect(
+				PaperaSession.completeSignIn(
+					asPlugin,
+					callbackOf({ code: 'code-1', state: 'state-1' }),
+				),
+			).rejects.toThrow(/another Papera account/);
+
+			expect(vaultIndex.recordAccount).not.toHaveBeenCalled();
+			expect(PaperaSettingsStore.current().accessToken).toBeUndefined();
 		});
 
 		it('refuses a second Papera account and revokes the refresh token it received', async () => {
@@ -411,6 +449,23 @@ describe('PaperaSession', () => {
 				accessTokenExpiresAt: undefined,
 				accountId: undefined,
 			});
+		});
+
+		it('leaves the account record in place', async () => {
+			const { asPlugin } = await signedInWith({
+				clientId: 'client-1',
+				accessToken: 'access-1',
+				refreshToken: 'refresh-1',
+				accountId: 'account-1',
+			});
+
+			vaultIndex.accountId.mockReturnValue('account-1');
+			oauthClient.revokeRefreshToken.mockResolvedValue(undefined);
+
+			await PaperaSession.signOut(asPlugin);
+
+			expect(vaultIndex.recordAccount).not.toHaveBeenCalled();
+			expect(vaultIndex.accountId()).toBe('account-1');
 		});
 	});
 });

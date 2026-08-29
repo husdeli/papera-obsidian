@@ -27,6 +27,7 @@ describe('PaperaSettingsStore', () => {
 
 		await expect(PaperaSettingsStore.load(asPlugin)).resolves.toEqual({
 			baseUrl: paperaConfig.defaultSettings.baseUrl,
+			reservedRoot: paperaConfig.defaultSettings.reservedRoot,
 		});
 	});
 
@@ -35,6 +36,7 @@ describe('PaperaSettingsStore', () => {
 
 		await expect(PaperaSettingsStore.load(asPlugin)).resolves.toEqual({
 			baseUrl: 'https://staging.papera.dev',
+			reservedRoot: paperaConfig.defaultSettings.reservedRoot,
 		});
 	});
 
@@ -43,7 +45,30 @@ describe('PaperaSettingsStore', () => {
 
 		await expect(PaperaSettingsStore.load(asPlugin)).resolves.toEqual({
 			baseUrl: paperaConfig.defaultSettings.baseUrl,
+			reservedRoot: paperaConfig.defaultSettings.reservedRoot,
 		});
+	});
+
+	it('keeps a saved reserved root folder name', async () => {
+		const { asPlugin } = pluginWith({ reservedRoot: 'Writing' });
+
+		const settings = await PaperaSettingsStore.load(asPlugin);
+
+		expect(settings.reservedRoot).toBe('Writing');
+	});
+
+	it.each([
+		['is missing', undefined],
+		['is empty', '   '],
+		['has the wrong type', 42],
+		['holds a forward slash', 'Work/Papera'],
+		['holds a backslash', 'Work\\Papera'],
+	])('falls back to Papera when the saved reserved root %s', async (_name, saved) => {
+		const { asPlugin } = pluginWith({ reservedRoot: saved });
+
+		const settings = await PaperaSettingsStore.load(asPlugin);
+
+		expect(settings.reservedRoot).toBe('Papera');
 	});
 
 	it('keeps the saved tokens, the expiry and the account', async () => {

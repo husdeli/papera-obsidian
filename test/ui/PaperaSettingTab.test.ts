@@ -13,10 +13,11 @@ const session = vi.hoisted(() => ({
 vi.mock('../../src/services/PaperaSession', () => ({ PaperaSession: session }));
 
 const BASE_URL = 'https://papera.dev';
+const RESERVED_ROOT = 'Papera';
 
 function pluginStub() {
 	const plugin = {
-		loadData: vi.fn().mockResolvedValue({ baseUrl: BASE_URL }),
+		loadData: vi.fn().mockResolvedValue({ baseUrl: BASE_URL, reservedRoot: RESERVED_ROOT }),
 		saveData: vi.fn().mockResolvedValue(undefined),
 	};
 
@@ -60,14 +61,14 @@ describe('PaperaSettingTab', () => {
 	});
 
 	it('shows the sign-in row while the vault is signed out', () => {
-		expect(visibleRowNames(tab)).toEqual(['Papera address', 'Sign in']);
+		expect(visibleRowNames(tab)).toEqual(['Papera address', 'Papera folder', 'Sign in']);
 	});
 
 	it('shows the sign-out row with the account while the vault is signed in', () => {
 		session.isSignedIn.mockReturnValue(true);
 		session.accountId.mockReturnValue('account-1');
 
-		expect(visibleRowNames(tab)).toEqual(['Papera address', 'Sign out']);
+		expect(visibleRowNames(tab)).toEqual(['Papera address', 'Papera folder', 'Sign out']);
 		expect(rowNamed(tab, 'Sign out').desc).toContain('account-1');
 	});
 
@@ -82,5 +83,22 @@ describe('PaperaSettingTab', () => {
 		expect(plugin.saveData).toHaveBeenCalledWith(
 			expect.objectContaining({ baseUrl: 'http://localhost:8080' }),
 		);
+	});
+
+	it('reads the reserved root folder name through the settings store', () => {
+		expect(tab.getControlValue('reservedRoot')).toBe(RESERVED_ROOT);
+	});
+
+	it('writes the reserved root folder name through the settings store', async () => {
+		await tab.setControlValue('reservedRoot', 'Writing');
+
+		expect(PaperaSettingsStore.current().reservedRoot).toBe('Writing');
+	});
+
+	it('refuses a reserved root folder name holding a separator', async () => {
+		await tab.setControlValue('reservedRoot', 'Work/Papera');
+
+		expect(PaperaSettingsStore.current().reservedRoot).toBe(RESERVED_ROOT);
+		expect(plugin.saveData).not.toHaveBeenCalled();
 	});
 });

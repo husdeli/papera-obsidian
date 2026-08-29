@@ -35,7 +35,7 @@ that no local change is unpushed before it deletes anything.
 1. **Account section**: sign in, sign out, and the signed-in identity.
 2. **Root folder setting**: edit the name, and move the existing folder when it changes.
 3. **Project list**: read the project list from the API and render one switch per project.
-4. **Unsync check**: compare each note's revision and content against what the index records, and list anything unpushed.
+4. **Unsync check**: compare each note's revision and content against what the in-memory map records, and list anything unpushed.
 5. **Unsync confirm**: name the affected notes and ask before deleting the folder.
 6. **Status**: show the last sync time and the per-project failures from PO-006.
 

@@ -38,6 +38,10 @@ export class PaperaSettingsStore {
 				fields.baseUrl,
 				paperaConfig.defaultSettings.baseUrl,
 			),
+			reservedRoot: PaperaSettingsStore.asFolderName(
+				fields.reservedRoot,
+				paperaConfig.defaultSettings.reservedRoot,
+			),
 			clientId: PaperaSettingsStore.asOptionalString(fields.clientId),
 			accessToken: PaperaSettingsStore.asOptionalString(fields.accessToken),
 			refreshToken: PaperaSettingsStore.asOptionalString(fields.refreshToken),
@@ -57,6 +61,14 @@ export class PaperaSettingsStore {
 
 	private static asString(value: unknown, fallback: string): string {
 		return typeof value === 'string' ? value : fallback;
+	}
+
+	private static asFolderName(value: unknown, fallback: string): string {
+		if (typeof value !== 'string' || value.trim() === '' || /[/\\]/.test(value)) {
+			return fallback;
+		}
+
+		return value;
 	}
 
 	private static asOptionalString(value: unknown): string | undefined {

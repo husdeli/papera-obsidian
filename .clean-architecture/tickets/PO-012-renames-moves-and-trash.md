@@ -25,7 +25,7 @@ this case must reach the delete path in PO-011 rather than being swallowed as a 
 - [ ] The renamed note keeps its `papera_id`.
 - [ ] Case (a) — a whole workflow folder moves between two project folders: the plugin moves that workflow to the other project in Papera.
 - [ ] Case (a2) — a single note moves between two workflow folders: the plugin returns the file to its original folder and tells the user that a note belongs to the work it was written for.
-- [ ] Case (b) — a note moves out of the reserved root: the plugin drops it from `.papera-index.json` and deletes nothing in Papera.
+- [ ] Case (b) — a note moves out of the reserved root: the plugin drops it from the in-memory map and deletes nothing in Papera.
 - [ ] Case (c) — a note is renamed into `.trash/`: the plugin treats it as a delete, not as case (b).
 - [ ] A note moved back into a project folder with its `papera_id` intact is adopted again, and is not created twice.
 - [ ] Renaming a project folder renames the project in Papera, and the plugin tells the user that the rename reached Papera.
@@ -41,14 +41,14 @@ this case must reach the delete path in PO-011 rather than being swallowed as a 
 2. **Title change**: a rename inside the same project folder pushes a title change.
 3. **Case (a)**: a workflow folder moved into another project pushes a project move.
 4. **Case (a2)**: a note moved into another workflow folder is returned to where it came from, with an explanation.
-5. **Case (b)**: a rename out of the reserved root removes the index entry.
+5. **Case (b)**: a rename out of the reserved root removes the map entry.
 6. **Case (c)**: a rename into `.trash/` pushes a delete. The check runs before the case (b) check.
 7. **Re-adoption**: a note arriving in a project folder with a `papera_id` matches an existing content unit instead of creating one.
 8. **Document**: write the five cases into the design doc.
 
 ## Decisions
 
-- **A workflow moves, a note does not.** A workflow belongs to a project as a unit, and moving one is a single column update in Papera. A note belongs to the work it was written for, and moving it between workflows would rewrite Papera's graph.
+- **A workflow moves, a note does not.** A workflow belongs to a project as a unit, and Papera moves one on request. A note belongs to the work it was written for, and Papera refuses to move one between workflows.
 - **A folder rename reaches Papera, and says so.** Renaming a folder in a vault does not usually leave the vault, so the plugin tells the person it did. It does not ask first: a project rename is reversible, unlike a delete.
 - **A rename replaces the Papera name with what the person typed.** The folder name is a sanitized form of the Papera name, so a name holding a character a folder cannot carry loses it on the way back. The plugin reports the difference rather than hiding it.
 - **Trash is checked before scope.** `.trash/` sits outside the reserved root, so the case (c) check must run first or case (b) swallows it.
@@ -75,10 +75,11 @@ this case must reach the delete path in PO-011 rather than being swallowed as a 
 
 ## Related
 
-- Related Tickets: PO-010 (which delivers the rename events), PO-011, PO-009
+- Related Tickets: PO-010 (which delivers the rename events), PO-011
 
 ---
 
 ## Iteration Log
 
 - **Iteration 1 (2026-08-23)**: Split out of the original single ticket, as item 6 of the feature brief asked.
+- **Iteration 2 (2026-08-25)**: The requirements on the Papera application moved out of this ticket. They are specified with Papera, and this ticket states none of them.

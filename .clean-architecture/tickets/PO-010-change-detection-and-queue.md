@@ -29,10 +29,12 @@ a marker, a pull enqueues every note it just wrote and pushes it straight back.
 - [ ] The queue survives a sync error on one item and continues with the rest.
 - [ ] The plugin shows how many changes are pending.
 - [ ] Closing the vault with pending changes does not lose them, or the plugin warns the user.
+- [ ] The plugin awaits `PaperaVaultMap.ready()` before it registers a vault event handler. That accessor resolves once the PO-004 map build finishes, and it resolves with an empty map when the reserved root folder does not exist, so the wait always ends.
+- [ ] A note whose `papera_id` the signed-in account does not own is never queued for a push, and never read as a note the person created in the vault.
 
 ## Implementation Steps
 
-1. **Subscribe**: the plugin registers the four vault event handlers on load, after the index loads.
+1. **Subscribe**: the plugin registers the four vault event handlers inside `Workspace.onLayoutReady`, after `PaperaVaultMap.ready()` resolves.
 2. **Scope filter**: each handler calls the PO-004 scope check first.
 3. **Self-write marker**: the plugin records the paths it writes, so its own events are ignored.
 4. **Debounce**: each file has its own 2 second timer, reset by each new event for that file.

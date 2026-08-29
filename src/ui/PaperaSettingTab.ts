@@ -1,9 +1,18 @@
-import { type App, type Plugin, PluginSettingTab, type SettingDefinitionItem } from 'obsidian';
+import {
+	type App,
+	Notice,
+	type Plugin,
+	PluginSettingTab,
+	type SettingDefinitionItem,
+} from 'obsidian';
 import { paperaConfig } from '../config/papera.config';
 import { type PaperaBrowserOpener, PaperaSession } from '../services/PaperaSession';
 import { PaperaSettingsStore } from '../services/PaperaSettingsStore';
 
 const BASE_URL_KEY = 'baseUrl';
+const RESERVED_ROOT_KEY = 'reservedRoot';
+const FOLDER_NAME_REFUSAL =
+	'The Papera folder sits at the top of the vault, so its name holds no slash.';
 
 export class PaperaSettingTab extends PluginSettingTab {
 	constructor(
@@ -30,6 +39,15 @@ export class PaperaSettingTab extends PluginSettingTab {
 						},
 					},
 					{
+						name: 'Papera folder',
+						desc: 'The folder this vault keeps every Papera project in. A change applies the next time Obsidian loads the plugin.',
+						control: {
+							type: 'text',
+							key: RESERVED_ROOT_KEY,
+							defaultValue: paperaConfig.defaultSettings.reservedRoot,
+						},
+					},
+					{
 						name: 'Sign in',
 						desc: 'Approve this vault in your browser. One sign-in covers every project you own.',
 						visible: () => !PaperaSession.isSignedIn(),
@@ -52,15 +70,42 @@ export class PaperaSettingTab extends PluginSettingTab {
 
 	// The inherited implementation reads and writes `plugin.settings`, and this plugin keeps its settings in PaperaSettingsStore.
 	getControlValue(key: string): unknown {
-		return key === BASE_URL_KEY ? PaperaSettingsStore.current().baseUrl : undefined;
+		const settings = PaperaSettingsStore.current();
+
+		switch (key) {
+			case BASE_URL_KEY:
+				return settings.baseUrl;
+			case RESERVED_ROOT_KEY:
+				return settings.reservedRoot;
+			default:
+				return undefined;
+		}
 	}
 
 	async setControlValue(key: string, value: unknown): Promise<void> {
-		if (key !== BASE_URL_KEY || typeof value !== 'string') {
+		if (typeof value !== 'string') {
 			return;
 		}
 
-		await PaperaSettingsStore.update(this.paperaPlugin, { baseUrl: value });
+		if (key === BASE_URL_KEY) {
+			await PaperaSettingsStore.update(this.paperaPlugin, { baseUrl: value });
+
+			return;
+		}
+
+		if (key === RESERVED_ROOT_KEY) {
+			await this.setReservedRoot(value);
+		}
+	}
+
+	private async setReservedRoot(value: string): Promise<void> {
+		if (value.includes('/') || value.includes('\\')) {
+			new Notice(FOLDER_NAME_REFUSAL);
+
+			return;
+		}
+
+		await PaperaSettingsStore.update(this.paperaPlugin, { reservedRoot: value });
 	}
 
 	private signedInAs(): string {

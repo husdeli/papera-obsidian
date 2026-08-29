@@ -5,6 +5,7 @@ import { PaperaHttpError } from '../models/PaperaHttpError';
 import { PaperaOAuthClient, type PaperaTokens } from './PaperaOAuthClient';
 import { PaperaPkce } from './PaperaPkce';
 import { PaperaSettingsStore } from './PaperaSettingsStore';
+import { PaperaVaultIndex } from './PaperaVaultIndex';
 
 const LOWEST_CLIENT_ERROR_STATUS = 400;
 const LOWEST_SERVER_ERROR_STATUS = 500;
@@ -124,7 +125,8 @@ export class PaperaSession {
 			codeVerifier,
 		});
 		const accountId = PaperaSession.accountIdOf(tokens.accessToken);
-		const knownAccountId = PaperaSettingsStore.current().accountId;
+		const knownAccountId =
+			PaperaVaultIndex.accountId() ?? PaperaSettingsStore.current().accountId;
 
 		if (knownAccountId !== undefined && accountId !== undefined && knownAccountId !== accountId) {
 			await PaperaSession.revokeQuietly(settings.baseUrl, clientId, tokens.refreshToken);
@@ -204,6 +206,10 @@ export class PaperaSession {
 			accessTokenExpiresAt: tokens.accessTokenExpiresAt,
 			accountId: accountId ?? PaperaSettingsStore.current().accountId,
 		});
+
+		if (accountId !== undefined) {
+			await PaperaVaultIndex.recordAccount(plugin, accountId);
+		}
 	}
 
 	private static async clearTokens(plugin: Plugin): Promise<void> {

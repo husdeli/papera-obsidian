@@ -34,15 +34,18 @@ after a rename.
 - [ ] A network failure on one content unit does not abandon the rest of the project.
 - [ ] The pull reports per-project success and failure to the user.
 - [ ] The pull writes no path outside the reserved root.
-- [ ] `.papera-index.json` records every id and path the pull wrote.
+- [ ] The in-memory map records every id and path the pull wrote. `.papera-index.json` holds the Papera account only, per PO-004 Iteration 3.
+- [ ] The pull answers which project and workflow a folder holds by inverting the project listing it already reads, and records the project and workflow entries into the PO-004 in-memory map on **every** pull, because the map is rebuilt from scratch at each launch and holds nothing from the last session.
+- [ ] The pull writes each note exactly three segments under the reserved root — project folder, workflow folder, note — because the PO-004 map skips a note at any other depth.
+- [ ] A note under the reserved root whose `papera_id` the signed-in account's project listing does not answer is never adopted, never overwritten and never deleted. The plugin tells the person the folder holds another account's work. Asking for something the person does not own tells the plugin nothing about whether it exists (R52).
 
 ## Implementation Steps
 
 1. **Read the selection**: the pull reads which projects sync from the settings.
 2. **Folders**: the pull creates, renames or keeps one folder per selected project, and one folder per workflow inside it.
 3. **Content units**: the pull writes one note per content unit, with frontmatter, and with its links translated by the PO-014 module. This ticket holds no translation logic of its own.
-4. **Change detection**: the pull compares the API revision against the revision in the index, and writes only what changed.
-5. **Deletions**: a content unit missing from the API removes its note and its index entry.
+4. **Change detection**: the pull compares the API revision against the revision the map holds, which PO-004 reads from each note's `papera_rev` frontmatter, and writes only what changed.
+5. **Deletions**: a content unit missing from the API removes its note and its map entry.
 6. **Failure isolation**: a `403` or a network failure is recorded per project, and the pull continues.
 7. **Reporting**: the pull tells the user what synced and what failed.
 
@@ -75,10 +78,11 @@ after a rename.
 
 ## Related
 
-- Related Tickets: PO-001, PO-003, PO-004, PO-014
+- Related Tickets: PO-003, PO-004, PO-014
 
 ---
 
 ## Iteration Log
 
 - **Iteration 1 (2026-08-23)**: Split out of the original single ticket.
+- **Iteration 2 (2026-08-25)**: The requirements on the Papera application moved out of this ticket. They are specified with Papera, and this ticket states none of them.

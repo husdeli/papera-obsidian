@@ -11,6 +11,13 @@ const restrictedGlobals = [
 	{ name: 'WebSocket', message: 'Use paperaHttpClient, which wraps requestUrl.' },
 ];
 
+const restrictedVaultAccess = [
+	{
+		selector: 'MemberExpression[property.name=/^(vault|adapter|metadataCache)$/]',
+		message: 'Reach the vault through PaperaVault, which runs the scope check first.',
+	},
+];
+
 export default defineConfig([
 	globalIgnores([
 		'node_modules',
@@ -34,6 +41,13 @@ export default defineConfig([
 		rules: {
 			'obsidianmd/no-nodejs-modules': 'error',
 			'no-restricted-globals': ['error', ...restrictedGlobals],
+			'no-restricted-syntax': ['error', ...restrictedVaultAccess],
+		},
+	},
+	{
+		files: ['src/services/PaperaVault.ts'],
+		rules: {
+			'no-restricted-syntax': 'off',
 		},
 	},
 	{

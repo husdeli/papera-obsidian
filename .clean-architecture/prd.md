@@ -1,12 +1,13 @@
 # Product Requirements Document
 
 **Status**: Draft
-**Last updated**: 2026-08-23
+**Last updated**: 2026-08-25
 **Product**: Papera for Obsidian — the official plugin that keeps Papera projects and an Obsidian vault in step
 
 **Related specifications**:
 
 - `design.md` — how each surface of the plugin looks and behaves.
+- `sync-requirements.md` — what the plugin needs from Papera to sync, as a numbered list of needs. It holds no design.
 
 ---
 
@@ -74,6 +75,17 @@ already know how to work with, and their edits travel back on their own.
 | The bulk editor | To make one change across many drafts at once | Runs a find-and-replace across a synced project and lets every change travel back |
 
 ## 5. How the product works
+
+### What Papera provides `PLATFORM`
+
+The product has two halves. The plugin is one, and the sync API in the Papera application
+is the other. The plugin signs in to a person's Papera account, reads their projects and
+the writing inside them, and sends their edits back. Papera holds the writing, decides who
+may read it, and refuses an edit that would overwrite a newer one.
+
+`sync-requirements.md` lists what the plugin needs from that half, and why the person
+loses something without each one. How Papera meets a need is decided and built with the
+Papera application, and it is not described here.
 
 ### Signing in `ACCOUNT`
 
