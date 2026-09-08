@@ -1,6 +1,6 @@
 # [PO-005] Link translation design pass
 
-**Status**: Not Started
+**Status**: Completed
 **Priority**: High
 **Effort**: M
 **Category**: docs
@@ -21,17 +21,17 @@ Papera, and it is the one answer this ticket waits on.
 
 ## Acceptance Criteria
 
-- [ ] A section of `.clean-architecture/design.md` specifies the translation in both directions.
-- [ ] The doc names which `href` values become wikilinks, and which stay ordinary Markdown links.
-- [ ] The doc specifies what a link to a content unit outside the synced set becomes.
-- [ ] The doc specifies what a link to a content unit in another synced project becomes.
-- [ ] The doc specifies what a wikilink pointing outside the reserved root becomes on push.
-- [ ] The doc specifies what a wikilink pointing at a note with no `papera_id` becomes on push.
-- [ ] The doc specifies how an image and an attachment link translate, and how an embed `![[...]]` translates.
-- [ ] The doc specifies how a link's display text maps to the wikilink alias form `[[target|text]]`.
-- [ ] The doc specifies the escaping for a title containing `|`, `#`, `^`, `[` or `]`.
-- [ ] The doc specifies what happens to a heading link `[[note#heading]]` and a block link `[[note^id]]`.
-- [ ] The doc lists every case where the round trip is lossy, and names the loss.
+- [x] A section of `.clean-architecture/design.md` specifies the translation in both directions.
+- [x] The doc names which `href` values become wikilinks, and which stay ordinary Markdown links.
+- [x] The doc specifies what a link to a content unit outside the synced set becomes.
+- [x] The doc specifies what a link to a content unit in another synced project becomes.
+- [x] The doc specifies what a wikilink pointing outside the reserved root becomes on push.
+- [x] The doc specifies what a wikilink pointing at a note with no `papera_id` becomes on push.
+- [x] The doc specifies how an image and an attachment link translate, and how an embed `![[...]]` translates.
+- [x] The doc specifies how a link's display text maps to the wikilink alias form `[[target|text]]`.
+- [x] The doc specifies the escaping for a title containing `|`, `#`, `^`, `[` or `]`.
+- [x] The doc specifies what happens to a heading link `[[note#heading]]` and a block link `[[note^id]]`.
+- [x] The doc lists every case where the round trip is lossy, and names the loss.
 
 ## Implementation Steps
 
@@ -47,6 +47,21 @@ Papera, and it is the one answer this ticket waits on.
 
 - **Design before code**: this is the highest-risk area in the feature, and it rewrites note bodies in both directions.
 - **A link that does not resolve is never dropped**: the doc must keep the user's text in every failure case.
+
+### Decisions settled 2026-08-29
+
+- **The assumed Papera address sits in one table**: the section names the address of a
+  content unit once, in a table marked as waiting on question Q1. Every other rule names
+  the address instead of repeating a URL. When Papera answers Q1, one table changes.
+- **A pulled wikilink carries the full path from the vault root**: for example
+  `[[Papera/Acme/Research/Kickoff notes|Kickoff notes]]`. Two notes that share a title in
+  two projects both keep resolving, whatever a later pull adds.
+- **An image arrives in two forms**: an embed `![[...]]` when the image carries no alt
+  text, and a Markdown image `![alt](...)` when it carries one. No alt text is lost, and
+  the plain case still looks like an ordinary Obsidian embed.
+- **The design doc calls the middle folder a workflow**: this matches the roadmap, every
+  ticket, and the shared decision "one subfolder per workflow". The PRD keeps the term
+  "piece of work" until someone changes it there.
 
 ## Technical Notes
 
@@ -72,3 +87,8 @@ Papera, and it is the one answer this ticket waits on.
 
 - **Iteration 1 (2026-08-23)**: Split out of the original single ticket, as item 10 of the feature brief asked.
 - **Iteration 2 (2026-08-25)**: The requirements on the Papera application moved out of this ticket. They are specified with Papera, and this ticket states none of them.
+- **Iteration 3 (2026-08-29)**: Section 2 of `design.md` is written. It specifies both
+  directions, the assumed content unit address in one table, the display text and escaping
+  rules, the image and attachment rules, the heading and block rules, and the loss table. The
+  design doc spells a block link `[[note#^block-id]]`, because that is Obsidian's own syntax.
+  The acceptance criterion above wrote `[[note^id]]`, which Obsidian does not resolve.
