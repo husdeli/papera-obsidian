@@ -6,7 +6,7 @@
 
 **Related specifications**:
 
-- `design.md` — how each surface of the plugin looks and behaves.
+- `designs/overview.design.md` — how each surface of the plugin looks and behaves.
 - `sync-requirements.md` — what the plugin needs from Papera to sync, as a numbered list of needs. It holds no design.
 
 ---

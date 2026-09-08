@@ -4,6 +4,8 @@
 
 Status values: ⬜ **Pending** · 🚧 **In Progress** · ✅ **Completed** · 🚫 **Blocked**
 
+Tickets sit in `tickets/todo/`, `tickets/in-progress/`, or `tickets/done/`. Find one by name.
+
 The plugin syncs Papera projects into one reserved root folder in a single Obsidian vault.
 Phase 1 ships a read-only pull. Phase 2 adds write-back. A failed write costs the user work
 that a failed read does not.
@@ -16,18 +18,18 @@ Nothing is blocked. PO-004 is the first task.
 
 | ID | Task | Status | Depends on | Needs from Papera | Ticket |
 | --- | --- | --- | --- | --- | --- |
-| PO-002 | Plugin skeleton and mobile-safe HTTP | ✅ **Completed** | — | — | `tickets/PO-002-plugin-skeleton.md` |
-| PO-003 | OAuth sign-in and token refresh | ✅ **Completed** | PO-002 | R1–R7 | `tickets/PO-003-oauth-sign-in.md` |
-| PO-004 | Reserved root, name safety and the vault index | ✅ **Completed** | PO-002, PO-003 | — | `tickets/PO-004-reserved-root-and-index.md` |
-| PO-005 | Link translation design pass | ✅ **Completed** | — | R36–R39 | `tickets/PO-005-link-translation-design.md` |
-| PO-014 | Link translation, both directions | ⬜ **Pending** | PO-004, PO-005 | — | `tickets/PO-014-link-translation.md` |
-| PO-006 | Pull projects and content units | ⬜ **Pending** | PO-003, PO-004, PO-014 | R8–R24, R46–R52 | `tickets/PO-006-pull-content.md` |
-| PO-007 | Selective sync settings tab | ⬜ **Pending** | PO-006 | — | `tickets/PO-007-selective-sync-settings.md` |
-| PO-008 | Pull attachments | ⬜ **Pending** | PO-006 | R40–R42 | `tickets/PO-008-pull-attachments.md` |
-| PO-010 | Vault change detection and the push queue | ⬜ **Pending** | PO-006 | — | `tickets/PO-010-change-detection-and-queue.md` |
-| PO-011 | Push with conflict detection | ⬜ **Pending** | PO-010, PO-014 | R25–R31 | `tickets/PO-011-push-with-conflicts.md` |
-| PO-012 | Renames, moves and trash | ⬜ **Pending** | PO-011 | R28, R32–R35 | `tickets/PO-012-renames-moves-and-trash.md` |
-| PO-013 | Push attachments | ⬜ **Pending** | PO-008, PO-011 | R43–R45 | `tickets/PO-013-push-attachments.md` |
+| PO-002 | Plugin skeleton and mobile-safe HTTP | ✅ **Completed** | — | — | `PO-002-plugin-skeleton.md` |
+| PO-003 | OAuth sign-in and token refresh | ✅ **Completed** | PO-002 | R1–R7 | `PO-003-oauth-sign-in.md` |
+| PO-004 | Reserved root, name safety and the vault index | ✅ **Completed** | PO-002, PO-003 | — | `PO-004-reserved-root-and-index.md` |
+| PO-005 | Link translation design pass | ✅ **Completed** | — | R36–R39 | `PO-005-link-translation-design.md` |
+| PO-014 | Link translation, both directions | ⬜ **Pending** | PO-004, PO-005 | — | `PO-014-link-translation.md` |
+| PO-006 | Pull projects and content units | ⬜ **Pending** | PO-003, PO-004, PO-014 | R8–R24, R46–R52 | `PO-006-pull-content.md` |
+| PO-007 | Selective sync settings tab | ⬜ **Pending** | PO-006 | — | `PO-007-selective-sync-settings.md` |
+| PO-008 | Pull attachments | ⬜ **Pending** | PO-006 | R40–R42 | `PO-008-pull-attachments.md` |
+| PO-010 | Vault change detection and the push queue | ⬜ **Pending** | PO-006 | — | `PO-010-change-detection-and-queue.md` |
+| PO-011 | Push with conflict detection | ⬜ **Pending** | PO-010, PO-014 | R25–R31 | `PO-011-push-with-conflicts.md` |
+| PO-012 | Renames, moves and trash | ⬜ **Pending** | PO-011 | R28, R32–R35 | `PO-012-renames-moves-and-trash.md` |
+| PO-013 | Push attachments | ⬜ **Pending** | PO-008, PO-011 | R43–R45 | `PO-013-push-attachments.md` |
 
 PO-002 through PO-008 and PO-014 ship Phase 1. PO-010 through PO-013 ship Phase 2.
 

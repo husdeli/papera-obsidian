@@ -33,7 +33,7 @@ this case must reach the delete path in PO-011 rather than being swallowed as a 
 - [ ] A folder rename does not ask for confirmation, because a rename is reversible.
 - [ ] A folder renamed to a name Papera cannot hold is reported, and the folder is returned to its previous name.
 - [ ] The person is told when the name they typed differs from the name Papera stored, because the folder name is a sanitized form.
-- [ ] Every case above is written into `.clean-architecture/design.md`.
+- [ ] Every case above is written into `.sdlc/designs/overview.design.md`.
 
 ## Implementation Steps
 

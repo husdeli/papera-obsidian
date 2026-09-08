@@ -2,7 +2,7 @@
 
 **Status**: Living document
 **Last updated**: 2026-08-29
-**Related**: `prd.md` (product requirements)
+**Related**: `../prd.md` (product requirements)
 
 <What this doc covers and what it does not. The PRD says what the product does; this doc
 says how it presents and behaves.>

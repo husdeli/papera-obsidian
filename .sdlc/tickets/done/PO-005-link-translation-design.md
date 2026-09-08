@@ -21,7 +21,7 @@ Papera, and it is the one answer this ticket waits on.
 
 ## Acceptance Criteria
 
-- [x] A section of `.clean-architecture/design.md` specifies the translation in both directions.
+- [x] A section of `.sdlc/designs/overview.design.md` specifies the translation in both directions.
 - [x] The doc names which `href` values become wikilinks, and which stay ordinary Markdown links.
 - [x] The doc specifies what a link to a content unit outside the synced set becomes.
 - [x] The doc specifies what a link to a content unit in another synced project becomes.
@@ -41,7 +41,7 @@ Papera, and it is the one answer this ticket waits on.
 4. **Write the push rules**: specify wikilink to Papera link.
 5. **Write the failure rules**: specify every case where a target does not resolve.
 6. **List the losses**: name each case where a round trip changes the note.
-7. **Write the section** into `.clean-architecture/design.md`.
+7. **Write the section** into `.sdlc/designs/overview.design.md`.
 
 ## Decisions
 

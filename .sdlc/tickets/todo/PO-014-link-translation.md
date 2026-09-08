@@ -43,7 +43,7 @@ tests are the acceptance gate, not an addition to it.
 
 ## Implementation Steps
 
-1. **Read the rules**: take the specification PO-005 wrote into `design.md` as the contract. Do not invent a rule that is not there. Send an unlisted case back to PO-005.
+1. **Read the rules**: take the specification PO-005 wrote into `designs/overview.design.md` as the contract. Do not invent a rule that is not there. Send an unlisted case back to PO-005.
 2. **Target resolution**: one function answers which Papera content unit a URL addresses, and which vault path holds it, using the index from PO-004.
 3. **Papera to wikilink**: convert a link, with its display text, its escaping, and its fallback when the target is not synced.
 4. **Wikilink to Papera**: convert a wikilink, with the same three concerns, and the rule that leaves an unresolvable wikilink untouched.

@@ -1,7 +1,7 @@
 # Papera for Obsidian — repository map
 
 The repository holds one Obsidian plugin. The plugin syncs Papera projects into one reserved
-root folder in a single vault. The product decisions live in `.clean-architecture/`.
+root folder in a single vault. The product decisions live in `.sdlc/`.
 
 ## Layout
 
@@ -52,7 +52,7 @@ a file needs it, and not before.
 - Every subscription goes through `registerEvent`, `registerDomEvent` or `registerInterval`,
   so Obsidian detaches it on unload.
 - `esbuild.config.ts` is the only file that reads `process.env`.
-- `.clean-architecture/sync-requirements.md` is the only file that names what the plugin
+- `.sdlc/sync-requirements.md` is the only file that names what the plugin
   needs from Papera. It names needs, never a design: no address, no field, no message, no
   code. How Papera meets a need is decided and built with the Papera application, never from
   this repository. A new need becomes a numbered row there, and a ticket cites the number.
