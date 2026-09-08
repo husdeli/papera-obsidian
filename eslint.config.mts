@@ -4,17 +4,31 @@ import { PlainTextParser } from 'eslint-plugin-obsidianmd/dist/lib/plainTextPars
 import tseslint from 'typescript-eslint';
 
 const restrictedGlobals = [
-	{ name: 'app', message: 'Use the plugin instance instead of the global app object.' },
-	{ name: 'localStorage', message: 'Use loadData and saveData through PaperaSettingsStore.' },
+	{
+		name: 'app',
+		message: 'Use the plugin instance instead of the global app object.',
+	},
+	{
+		name: 'localStorage',
+		message: 'Use loadData and saveData through PaperaSettingsStore.',
+	},
 	{ name: 'fetch', message: 'Use paperaHttpClient, which wraps requestUrl.' },
-	{ name: 'XMLHttpRequest', message: 'Use paperaHttpClient, which wraps requestUrl.' },
-	{ name: 'WebSocket', message: 'Use paperaHttpClient, which wraps requestUrl.' },
+	{
+		name: 'XMLHttpRequest',
+		message: 'Use paperaHttpClient, which wraps requestUrl.',
+	},
+	{
+		name: 'WebSocket',
+		message: 'Use paperaHttpClient, which wraps requestUrl.',
+	},
 ];
 
 const restrictedVaultAccess = [
 	{
-		selector: 'MemberExpression[property.name=/^(vault|adapter|metadataCache)$/]',
-		message: 'Reach the vault through PaperaVault, which runs the scope check first.',
+		selector:
+			'MemberExpression[property.name=/^(vault|adapter|metadataCache)$/]',
+		message:
+			'Reach the vault through PaperaVault, which runs the scope check first.',
 	},
 ];
 
@@ -71,7 +85,13 @@ export default defineConfig([
 		},
 	},
 	{
-		files: ['eslint.config.mts', 'esbuild.config.ts', 'vitest.config.ts', 'scripts/**/*.ts', 'test/**/*.ts'],
+		files: [
+			'eslint.config.mts',
+			'esbuild.config.ts',
+			'vitest.config.ts',
+			'scripts/**/*.ts',
+			'test/**/*.ts',
+		],
 		extends: [tseslint.configs.recommendedTypeChecked],
 		languageOptions: {
 			parserOptions: {

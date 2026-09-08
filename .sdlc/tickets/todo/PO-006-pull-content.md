@@ -36,6 +36,8 @@ after a rename.
 - [ ] The pull writes no path outside the reserved root.
 - [ ] The in-memory map records every id and path the pull wrote. `.papera-index.json` holds the Papera account only, per PO-004 Iteration 3.
 - [ ] The pull answers which project and workflow a folder holds by inverting the project listing it already reads, and records the project and workflow entries into the PO-004 in-memory map on **every** pull, because the map is rebuilt from scratch at each launch and holds nothing from the last session.
+- [ ] The pull records each content unit's title into the PO-004 in-memory map on every pull, because the title is the wikilink alias PO-014 writes when a Papera link carries no display text.
+- [ ] `npm run build` runs again once the pull reaches the PO-014 parser, because `scripts/checkBundle.ts` covers `main.js` only and PO-014 proved the parser bundle outside the build.
 - [ ] The pull writes each note exactly three segments under the reserved root — project folder, workflow folder, note — because the PO-004 map skips a note at any other depth.
 - [ ] A note under the reserved root whose `papera_id` the signed-in account's project listing does not answer is never adopted, never overwritten and never deleted. The plugin tells the person the folder holds another account's work. Asking for something the person does not own tells the plugin nothing about whether it exists (R52).
 

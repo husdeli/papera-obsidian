@@ -1,6 +1,6 @@
 # [PO-014] Link translation, both directions
 
-**Status**: Not Started
+**Status**: Completed
 **Priority**: High
 **Effort**: L
 **Category**: feature
@@ -65,6 +65,7 @@ tests are the acceptance gate, not an addition to it.
 ### Data Requirements
 
 - The index from PO-004 supplies the mapping between a Papera id, a vault path and a note title. Target resolution reads it and writes nothing.
+- The attachment lookup answers "unknown" until PO-008 fills the storage-key map, so the criterion "An image link resolves to the project's local attachment" is proved here with a fake resolver and is not shipped behaviour until PO-008.
 
 ### Architectural Considerations
 
@@ -91,3 +92,24 @@ tests are the acceptance gate, not an addition to it.
 ## Iteration Log
 
 - **Iteration 1 (2026-08-23)**: Split out of PO-006 and PO-011, so the highest-risk code is planned, reviewed and tested on its own rather than as a bullet inside two larger tickets.
+- **Iteration 2 (2026-09-08)**: Measured what the CommonMark parser costs the bundle. A scratch esbuild bundle of `src/domain/paperaMarkdownSpans.ts`, built with the settings of `esbuild.config.ts`, is 58,676 bytes minified (58.7 kB), against today's `main.js` of 18,288 bytes (18.3 kB). `findNodeBuiltinImports` reports no Node built-in in that bundle, so the mobile guard holds.
+
+---
+
+## Decisions from the interview (2026-09-08)
+
+- **A CommonMark parser finds the links.** The module uses `mdast-util-from-markdown`, the
+  plugin's first runtime dependency. The parser reports a byte offset for every link, so the
+  module splices the original text and leaves every other byte untouched. This is what
+  enforces section 2.7: no rule runs inside a fenced code block, an inline code span, or the
+  identity block. A hand-written scanner would make every CommonMark edge case our own bug,
+  and a bug here corrupts a person's text.
+- **Obsidian resolves a wikilink; the module asks.** `PaperaVault` wraps
+  `metadataCache.getFirstLinkpathDest`, and the caller passes the answer into the pure module
+  as an injected function. The plugin then agrees with Obsidian by construction. A link the
+  plugin resolves differently opens one note in the vault and points at another in Papera.
+  The tests supply a fake resolver.
+- **A heading fragment travels back on the pull.** A Papera link that holds a fragment becomes
+  `[[path#Heading|text]]`. Section 2.6 gains this one rule. The round-trip criterion then
+  holds for a heading link, and the person keeps the anchor they wrote.
+

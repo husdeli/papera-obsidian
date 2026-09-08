@@ -1,7 +1,7 @@
 # Papera for Obsidian — design
 
 **Status**: Living document
-**Last updated**: 2026-08-29
+**Last updated**: 2026-09-08
 **Related**: `../prd.md` (product requirements)
 
 <What this doc covers and what it does not. The PRD says what the product does; this doc
@@ -45,6 +45,12 @@ A link is a **Papera link** when two things hold. Its origin is the Papera addre
 signed in to. Its path is one the table above recognises. A link that fails either test is an
 ordinary link to somewhere else, and no rule in this section touches it.
 
+PO-014 adds this rule. Only an inline Markdown link and an inline Markdown image carry a rule.
+An autolink, a bare URL and a reference-style link stay unchanged in both directions. A link
+whose address carries a query stays unchanged too, because no wikilink can hold a query. A link
+whose display text holds more than plain text stays unchanged as well, because the plugin
+cannot move an image or emphasis into a wikilink alias without losing it.
+
 ### 2.2 What a Papera link becomes in the vault
 
 A wikilink written into a synced note carries the full path from the vault root, and it carries
@@ -84,6 +90,9 @@ display text is unchanged. It still opens the writing in Papera.
 | A wikilink whose target is no file at all | The person's text, unchanged |
 | A vault-relative Markdown link to a synced note | A link to that content unit address, with the same display text |
 | An ordinary external link | The link, unchanged |
+
+PO-014 adds this rule. A wikilink carrying no alias travels with the title of the content unit
+as its display text, and with the note file name when the title is unknown.
 
 Any spelling of a wikilink to a synced note travels to Papera, not only the full-path form of
 §2.2. Obsidian respells its own links after a rename, and a person writes a shorter form by
@@ -148,9 +157,10 @@ A heading link travels to Papera as the content unit address with the heading as
 fragment. A block link travels as the content unit address alone, without the block identifier,
 because the plugin carries no block identifier.
 
-This section carries no rule that writes a heading link or a block link into a note. The
-content unit address addresses a whole content unit, and it carries no heading and no block, so
-a link arriving from Papera points at a whole note.
+A Papera link that carries a heading fragment arrives as a wikilink holding that heading, as
+`[[Papera/Acme/Research/Kickoff notes#Agenda|Kickoff notes]]`. A Papera link that carries no
+fragment points at a whole note. No rule writes a block link into a note, because a Papera link
+carries no block identifier.
 
 ### 2.7 Where the rules do not apply
 
@@ -165,10 +175,12 @@ names the case and then the loss.
 
 | The case | The loss |
 | --- | --- |
-| A link carrying a heading fragment | The heading. The link returns pointing at the whole note |
 | A block link | The block identifier. The link returns pointing at the whole note |
 | A Papera link with no display text | Nothing of the text. The link returns carrying the title of the content unit as its display text |
+| A wikilink carrying no alias | The short form. The link returns carrying the title of the content unit as its alias |
 | A display text holding `\|`, `[` or `]` | The wikilink form. The note holds a Markdown link instead |
+| A display text that Markdown reads as markup | The wikilink form. The note holds a Markdown link, and every punctuation character in the display text carries a backslash |
+| A character reference in a display text | Its spelling. The display text returns holding the character the reference names |
 | A pipe inside a Markdown table cell | The exact characters. The note holds a backslash before the pipe, and Papera holds the pipe alone |
 | An embed of a synced note | The embed never reaches Papera. The plugin holds the note back and tells the person |
 | An image whose alt text was added or removed | The link form. Adding alt text turns an embed into a Markdown image, and removing it turns the image back into an embed |

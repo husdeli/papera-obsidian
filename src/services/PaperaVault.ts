@@ -84,6 +84,12 @@ export class PaperaVault {
 		return notes;
 	}
 
+	static linkTargetPath(plugin: Plugin, sourcePath: string, target: string): string | undefined {
+		const file = plugin.app.metadataCache.getFirstLinkpathDest(target, sourcePath);
+
+		return file === null ? undefined : file.path;
+	}
+
 	static isMetadataWarm(plugin: Plugin): boolean {
 		return Object.keys(plugin.app.metadataCache.resolvedLinks).length > 0;
 	}

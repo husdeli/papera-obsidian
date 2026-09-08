@@ -30,12 +30,20 @@ function vaultWith(root: TFolder | null) {
 	};
 }
 
-function metadataWith(frontmatter: Map<string, Record<string, unknown> | null>) {
+function metadataWith(
+	frontmatter: Map<string, Record<string, unknown> | null>,
+	targets = new Map<string, string>(),
+) {
 	return {
 		getFileCache: vi.fn((file: TFile) => {
 			const cached = frontmatter.get(file.path);
 
 			return cached === undefined || cached === null ? null : { frontmatter: cached };
+		}),
+		getFirstLinkpathDest: vi.fn((linkpath: string, sourcePath: string) => {
+			const found = targets.get(`${sourcePath}|${linkpath}`);
+
+			return found === undefined ? null : fileAt(found);
 		}),
 		resolvedLinks: {} as Record<string, unknown>,
 		on: vi.fn((name: string, callback: () => void) => ({ name, callback })),
@@ -188,6 +196,30 @@ describe('PaperaVault', () => {
 			await expect(PaperaVault.markdownNotes(asPlugin)).resolves.toEqual([
 				{ path: NOTE_PATH, frontmatter: {} },
 			]);
+		});
+	});
+
+	describe('the wikilink target', () => {
+		it('answers the vault path Obsidian resolves the target to', () => {
+			const metadataCache = metadataWith(
+				new Map(),
+				new Map([[`${NOTE_PATH}|Kickoff notes`, 'Papera/Acme/Research/Kickoff notes.md']]),
+			);
+			const { asPlugin } = pluginWith(vaultWith(null), metadataCache);
+
+			expect(PaperaVault.linkTargetPath(asPlugin, NOTE_PATH, 'Kickoff notes')).toBe(
+				'Papera/Acme/Research/Kickoff notes.md',
+			);
+			expect(metadataCache.getFirstLinkpathDest).toHaveBeenCalledWith(
+				'Kickoff notes',
+				NOTE_PATH,
+			);
+		});
+
+		it('answers nothing for a target that resolves to no file', () => {
+			const { asPlugin } = pluginWith(vaultWith(null));
+
+			expect(PaperaVault.linkTargetPath(asPlugin, NOTE_PATH, 'Missing note')).toBeUndefined();
 		});
 	});
 

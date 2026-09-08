@@ -42,6 +42,7 @@ function shorterPath(one: string, other: string): string {
 
 export class PaperaVaultMap {
 	private static owned = new Map<string, PaperaVaultEntry>();
+	private static ownedIds = new Map<string, string>();
 	private static building: Promise<void> | undefined;
 	private static built: PaperaMapBuild | undefined;
 
@@ -60,7 +61,27 @@ export class PaperaVaultMap {
 	}
 
 	static put(id: string, entry: PaperaVaultEntry): void {
+		const known = PaperaVaultMap.owned.get(id);
+
+		if (known !== undefined) {
+			PaperaVaultMap.ownedIds.delete(known.path);
+		}
+
 		PaperaVaultMap.owned.set(id, entry);
+		PaperaVaultMap.ownedIds.set(entry.path, id);
+	}
+
+	static idAt(path: string): string | undefined {
+		return PaperaVaultMap.ownedIds.get(path);
+	}
+
+	static titleOf(id: string): string | undefined {
+		return PaperaVaultMap.owned.get(id)?.title;
+	}
+
+	// TODO: answer a vault path once PO-008 fills the attachment map; no map holds an attachment today.
+	static attachmentPathOf(): string | undefined {
+		return undefined;
 	}
 
 	private static async fill(plugin: Plugin): Promise<void> {
@@ -94,7 +115,7 @@ export class PaperaVaultMap {
 			return;
 		}
 
-		PaperaVaultMap.owned.set(id, {
+		PaperaVaultMap.put(id, {
 			path: note.path,
 			revision: asRevision(note.frontmatter[REVISION_FIELD]),
 		});

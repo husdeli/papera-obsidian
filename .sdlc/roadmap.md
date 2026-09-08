@@ -22,7 +22,7 @@ Nothing is blocked. PO-004 is the first task.
 | PO-003 | OAuth sign-in and token refresh | ✅ **Completed** | PO-002 | R1–R7 | `PO-003-oauth-sign-in.md` |
 | PO-004 | Reserved root, name safety and the vault index | ✅ **Completed** | PO-002, PO-003 | — | `PO-004-reserved-root-and-index.md` |
 | PO-005 | Link translation design pass | ✅ **Completed** | — | R36–R39 | `PO-005-link-translation-design.md` |
-| PO-014 | Link translation, both directions | ⬜ **Pending** | PO-004, PO-005 | — | `PO-014-link-translation.md` |
+| PO-014 | Link translation, both directions | ✅ **Completed** | PO-004, PO-005 | — | `PO-014-link-translation.md` |
 | PO-006 | Pull projects and content units | ⬜ **Pending** | PO-003, PO-004, PO-014 | R8–R24, R46–R52 | `PO-006-pull-content.md` |
 | PO-007 | Selective sync settings tab | ⬜ **Pending** | PO-006 | — | `PO-007-selective-sync-settings.md` |
 | PO-008 | Pull attachments | ⬜ **Pending** | PO-006 | R40–R42 | `PO-008-pull-attachments.md` |

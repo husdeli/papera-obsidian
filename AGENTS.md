@@ -41,7 +41,10 @@ a file needs it, and not before.
 - `src/services/PaperaVaultIndex.ts` is the only module that reads or writes
   `.papera-index.json`, and it writes the file only when the reserved root folder already exists.
 - `src/services/PaperaVaultMap.ts` holds the id-to-path map in memory, and no module writes that
-  map to disk. It is rebuilt from note frontmatter at every launch.
+  map to disk. It is rebuilt from note frontmatter at every launch. It also answers the id at a
+  path, from a reverse map that only `put` fills, so no caller can fill one map and forget the
+  other. A rebuild from frontmatter drops the note titles the last pull recorded, because
+  frontmatter carries no title, so a title is unknown until the next pull records it.
 - Every `Vault` event subscription is registered inside `Workspace.onLayoutReady`, and only after
   `PaperaVaultMap.ready()` resolves. That accessor resolves once the map build finishes, and it
   resolves with an empty map when the reserved root folder does not exist, so no caller waits on
@@ -51,6 +54,13 @@ a file needs it, and not before.
   header. Every Papera request goes through it, and the caller writes no header of its own.
 - Every subscription goes through `registerEvent`, `registerDomEvent` or `registerInterval`,
   so Obsidian detaches it on unload.
+- `src/domain/paperaMarkdownSpans.ts` is the only module that names `fromMarkdown`. It answers
+  which spans of a note body a rule may rewrite, and every rule splices at the offsets it reports.
+- The plugin's runtime dependencies are the ones listed under `dependencies` in `package.json`.
+  A hand-written Markdown scanner is not an option, because every CommonMark edge case would
+  become a bug of ours that corrupts a person's text.
+- PO-006 and PO-011 translate a note body through `src/domain/paperaLinkToWikilink.ts` and
+  `src/domain/paperaWikilinkToLink.ts`, and hold no translation logic of their own.
 - `esbuild.config.ts` is the only file that reads `process.env`.
 - `.sdlc/sync-requirements.md` is the only file that names what the plugin
   needs from Papera. It names needs, never a design: no address, no field, no message, no

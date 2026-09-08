@@ -22,7 +22,9 @@ function resolveDevVaultPluginDir(): string | undefined {
 	}
 
 	if (!existsSync(vault)) {
-		throw new Error(`PAPERA_DEV_VAULT points at a folder that does not exist: ${vault}`);
+		throw new Error(
+			`PAPERA_DEV_VAULT points at a folder that does not exist: ${vault}`,
+		);
 	}
 
 	return path.join(vault, '.obsidian', 'plugins', 'papera');

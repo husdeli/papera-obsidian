@@ -23,11 +23,13 @@ function noteAt(path: string, frontmatter: Record<string, unknown>): PaperaVault
 function forgetMap(): void {
 	const internals = PaperaVaultMap as unknown as {
 		owned: Map<string, unknown>;
+		ownedIds: Map<string, string>;
 		building: Promise<void> | undefined;
 		built: unknown;
 	};
 
 	internals.owned = new Map();
+	internals.ownedIds = new Map();
 	internals.building = undefined;
 	internals.built = undefined;
 }
@@ -106,6 +108,53 @@ describe('PaperaVaultMap', () => {
 		PaperaVaultMap.put('project-1', { path: 'Papera/Book Club' });
 
 		expect(PaperaVaultMap.get('project-1')?.path).toBe('Papera/Book Club');
+	});
+
+	it('answers the id at a path it remembered', async () => {
+		await buildFrom([noteAt(FIRST_NOTE, { papera_id: 'unit-1' })]);
+
+		expect(PaperaVaultMap.idAt(FIRST_NOTE)).toBe('unit-1');
+	});
+
+	it('leaves the old path answering nothing when a put moves an id', async () => {
+		await buildFrom([noteAt(FIRST_NOTE, { papera_id: 'unit-1' })]);
+		PaperaVaultMap.put('unit-1', { path: SECOND_NOTE });
+
+		expect(PaperaVaultMap.idAt(FIRST_NOTE)).toBeUndefined();
+		expect(PaperaVaultMap.idAt(SECOND_NOTE)).toBe('unit-1');
+		expect(PaperaVaultMap.get('unit-1')?.path).toBe(SECOND_NOTE);
+	});
+
+	it('answers the id at the shorter path of a duplicated id', async () => {
+		const conflictCopy = 'Papera/Book Club/Drafts/one (conflict 2026-08-28).md';
+
+		await buildFrom([
+			noteAt(conflictCopy, { papera_id: 'unit-1' }),
+			noteAt(FIRST_NOTE, { papera_id: 'unit-1' }),
+		]);
+
+		expect(PaperaVaultMap.get('unit-1')?.path).toBe(FIRST_NOTE);
+		expect(PaperaVaultMap.idAt(FIRST_NOTE)).toBe('unit-1');
+		expect(PaperaVaultMap.idAt(conflictCopy)).toBeUndefined();
+	});
+
+	it('answers the title a caller recorded', async () => {
+		await buildFrom([]);
+		PaperaVaultMap.put('unit-1', { path: FIRST_NOTE, title: 'Kickoff notes' });
+
+		expect(PaperaVaultMap.titleOf('unit-1')).toBe('Kickoff notes');
+	});
+
+	it('answers no title for a note the frontmatter rebuild remembered', async () => {
+		await buildFrom([noteAt(FIRST_NOTE, { papera_id: 'unit-1' })]);
+
+		expect(PaperaVaultMap.titleOf('unit-1')).toBeUndefined();
+	});
+
+	it('answers no attachment path, even for an id the content unit map holds', async () => {
+		await buildFrom([noteAt(FIRST_NOTE, { papera_id: 'unit-1' })]);
+
+		expect(PaperaVaultMap.attachmentPathOf()).toBeUndefined();
 	});
 
 	it('walks the vault once when the build is asked for twice', async () => {
