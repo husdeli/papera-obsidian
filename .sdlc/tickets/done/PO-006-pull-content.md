@@ -1,6 +1,6 @@
 # [PO-006] Pull projects and content units
 
-**Status**: Not Started
+**Status**: Completed
 **Priority**: Critical
 **Effort**: L
 **Category**: feature
@@ -56,6 +56,7 @@ after a rename.
 - **Phase 1 overwrites local edits.** The plugin has no push yet, so a local edit has nowhere to go. The settings tab must say so plainly until PO-011 ships.
 - **Revision drives the write.** Comparing revisions avoids rewriting every note on every sync, which would make Obsidian re-index the whole vault.
 - **A rename goes through Obsidian, not around it.** Obsidian's file-rename path updates inbound wikilinks on its own. A raw write plus delete would leave every link to the note broken.
+- **A deletion is scoped to a folder this account owns.** The pull removes a note only when both hold: the note sits inside a workflow folder that inverting a successfully listed project assigned to a workflow of that project, and no listing of the signed-in account answers its `papera_id`. Every other note whose id no listing answers is reported to the person and left exactly as it is, which is how acceptance criterion 22 is read. Asking Papera about an id the person does not own answers nothing (R52), so a `papera_id` alone cannot tell a deleted content unit from another account's note. The reading rests on two settled product decisions: "One vault, one Papera account" in `.sdlc/roadmap.md`, and the non-goal "Two Papera accounts in one vault" in section 3 of `.sdlc/prd.md`. A ticket that ever allows two accounts in one vault must revisit this rule first.
 
 ## Technical Notes
 
@@ -88,3 +89,4 @@ after a rename.
 
 - **Iteration 1 (2026-08-23)**: Split out of the original single ticket.
 - **Iteration 2 (2026-08-25)**: The requirements on the Papera application moved out of this ticket. They are specified with Papera, and this ticket states none of them.
+- **Iteration 3 (2026-09-09)**: Built the pull. `main.js` is 91,815 bytes minified (91.8 kB), against 18,260 bytes (18.3 kB) before the pull reached the PO-014 parser. `scripts/checkBundle.ts` reports that `main.js` imports no Node built-in module, so the mobile guard holds inside the real bundle for the first time.

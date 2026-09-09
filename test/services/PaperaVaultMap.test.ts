@@ -138,6 +138,33 @@ describe('PaperaVaultMap', () => {
 		expect(PaperaVaultMap.idAt(conflictCopy)).toBeUndefined();
 	});
 
+	it('answers a copy of its entries', async () => {
+		await buildFrom([noteAt(FIRST_NOTE, { papera_id: 'unit-1', papera_rev: 3 })]);
+
+		const entries = PaperaVaultMap.entries();
+
+		expect([...entries]).toEqual([['unit-1', { path: FIRST_NOTE, revision: 3 }]]);
+
+		entries.clear();
+
+		expect(PaperaVaultMap.get('unit-1')?.path).toBe(FIRST_NOTE);
+	});
+
+	it('forgets an id and the path that answered it', async () => {
+		await buildFrom([noteAt(FIRST_NOTE, { papera_id: 'unit-1' })]);
+		PaperaVaultMap.forget('unit-1');
+
+		expect(PaperaVaultMap.get('unit-1')).toBeUndefined();
+		expect(PaperaVaultMap.idAt(FIRST_NOTE)).toBeUndefined();
+	});
+
+	it('forgets an id it never held without disturbing the rest', async () => {
+		await buildFrom([noteAt(FIRST_NOTE, { papera_id: 'unit-1' })]);
+		PaperaVaultMap.forget('unit-9');
+
+		expect(PaperaVaultMap.get('unit-1')?.path).toBe(FIRST_NOTE);
+	});
+
 	it('answers the title a caller recorded', async () => {
 		await buildFrom([]);
 		PaperaVaultMap.put('unit-1', { path: FIRST_NOTE, title: 'Kickoff notes' });

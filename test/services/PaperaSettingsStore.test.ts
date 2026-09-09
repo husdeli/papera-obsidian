@@ -125,6 +125,35 @@ describe('PaperaSettingsStore', () => {
 		expect(settings.pendingSignIn).toBeUndefined();
 	});
 
+	it('keeps a saved list of the projects that sync', async () => {
+		const { asPlugin } = pluginWith({ syncedProjectIds: ['project-1', 'project-2'] });
+
+		const settings = await PaperaSettingsStore.load(asPlugin);
+
+		expect(settings.syncedProjectIds).toEqual(['project-1', 'project-2']);
+	});
+
+	it('keeps an empty list of the projects that sync', async () => {
+		const { asPlugin } = pluginWith({ syncedProjectIds: [] });
+
+		const settings = await PaperaSettingsStore.load(asPlugin);
+
+		expect(settings.syncedProjectIds).toEqual([]);
+	});
+
+	it.each([
+		['a number', 42],
+		['a string', 'project-1'],
+		['a mixed array', ['project-1', 7]],
+		['an array holding an empty id', ['project-1', '']],
+	])('falls back to every project when the saved selection is %s', async (_name, saved) => {
+		const { asPlugin } = pluginWith({ syncedProjectIds: saved });
+
+		const settings = await PaperaSettingsStore.load(asPlugin);
+
+		expect(settings.syncedProjectIds).toBeUndefined();
+	});
+
 	it('saves the merged settings when one field changes', async () => {
 		const { plugin, asPlugin } = pluginWith({ baseUrl: 'https://staging.papera.dev' });
 

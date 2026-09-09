@@ -48,6 +48,7 @@ export class PaperaSettingsStore {
 			accessTokenExpiresAt: PaperaSettingsStore.asOptionalNumber(fields.accessTokenExpiresAt),
 			accountId: PaperaSettingsStore.asOptionalString(fields.accountId),
 			pendingSignIn: PaperaSettingsStore.asPendingSignIn(fields.pendingSignIn),
+			syncedProjectIds: PaperaSettingsStore.asProjectIds(fields.syncedProjectIds),
 		};
 	}
 
@@ -77,6 +78,18 @@ export class PaperaSettingsStore {
 
 	private static asOptionalNumber(value: unknown): number | undefined {
 		return typeof value === 'number' && Number.isFinite(value) ? value : undefined;
+	}
+
+	private static asProjectIds(value: unknown): string[] | undefined {
+		if (!Array.isArray(value)) {
+			return undefined;
+		}
+
+		const ids = value as unknown[];
+
+		return ids.every((id) => typeof id === 'string' && id !== '')
+			? (ids as string[])
+			: undefined;
 	}
 
 	private static asPendingSignIn(value: unknown): PaperaPendingSignIn | undefined {

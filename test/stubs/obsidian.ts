@@ -73,10 +73,17 @@ export function parseYaml(yaml: string): unknown {
 	return fields;
 }
 
+export function stringifyYaml(value: unknown): string {
+	return Object.entries(value as Record<string, unknown>)
+		.map(([key, field]) => `${key}: ${String(field)}\n`)
+		.join('');
+}
+
 export class Plugin {
 	loadData = vi.fn();
 	saveData = vi.fn();
 	addSettingTab = vi.fn();
+	addCommand = vi.fn();
 	registerObsidianProtocolHandler = vi.fn();
 	registerEvent = vi.fn();
 	registerInterval = vi.fn();
@@ -97,6 +104,10 @@ export class PluginSettingTab {
 	setControlValue(): void {}
 }
 
+export const shownNotices: string[] = [];
+
 export class Notice {
-	constructor(readonly message: string) {}
+	constructor(readonly message: string) {
+		shownNotices.push(message);
+	}
 }

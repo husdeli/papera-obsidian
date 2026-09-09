@@ -26,7 +26,7 @@ const restrictedGlobals = [
 const restrictedVaultAccess = [
 	{
 		selector:
-			'MemberExpression[property.name=/^(vault|adapter|metadataCache)$/]',
+			'MemberExpression[property.name=/^(vault|adapter|metadataCache|fileManager)$/]',
 		message:
 			'Reach the vault through PaperaVault, which runs the scope check first.',
 	},

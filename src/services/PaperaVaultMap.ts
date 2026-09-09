@@ -71,6 +71,21 @@ export class PaperaVaultMap {
 		PaperaVaultMap.ownedIds.set(entry.path, id);
 	}
 
+	static entries(): Map<string, PaperaVaultEntry> {
+		return new Map(PaperaVaultMap.owned);
+	}
+
+	static forget(id: string): void {
+		const known = PaperaVaultMap.owned.get(id);
+
+		if (known === undefined) {
+			return;
+		}
+
+		PaperaVaultMap.owned.delete(id);
+		PaperaVaultMap.ownedIds.delete(known.path);
+	}
+
 	static idAt(path: string): string | undefined {
 		return PaperaVaultMap.ownedIds.get(path);
 	}

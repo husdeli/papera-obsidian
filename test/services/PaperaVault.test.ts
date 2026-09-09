@@ -10,6 +10,7 @@ const OUTSIDE_PATH = 'Journal/note.md';
 const INDEX_PATH = 'Papera/.papera-index.json';
 
 const texts = new Map<string, string>();
+const folders = new Map<string, TFolder>();
 
 function fileAt(path: string): TFile {
 	return Object.assign(new TFile(), { path });
@@ -19,14 +20,32 @@ function folderAt(path: string, children: TAbstractFile[] = []): TFolder {
 	return Object.assign(new TFolder(), { path, children });
 }
 
+const files = new Map<string, TFile>();
+
 function vaultWith(root: TFolder | null) {
 	return {
-		getFolderByPath: vi.fn(() => root),
+		getFolderByPath: vi.fn((path: string) => (path === ROOT ? root : (folders.get(path) ?? null))),
+		getFileByPath: vi.fn((path: string) => files.get(path) ?? null),
+		getAbstractFileByPath: vi.fn(
+			(path: string): TAbstractFile | null => files.get(path) ?? folders.get(path) ?? null,
+		),
+		create: vi.fn(() => Promise.resolve()),
+		createFolder: vi.fn(() => Promise.resolve()),
+		process: vi.fn((_file: TFile, change: (data: string) => string) =>
+			Promise.resolve(change('old')),
+		),
 		cachedRead: vi.fn((file: TFile) => Promise.resolve(texts.get(file.path) ?? '')),
 		adapter: {
 			read: vi.fn(() => Promise.resolve('{}')),
 			write: vi.fn(() => Promise.resolve()),
 		},
+	};
+}
+
+function fileManagerStub() {
+	return {
+		renameFile: vi.fn(() => Promise.resolve()),
+		trashFile: vi.fn(() => Promise.resolve()),
 	};
 }
 
@@ -51,12 +70,13 @@ function metadataWith(
 }
 
 function pluginWith(vault: ReturnType<typeof vaultWith>, metadataCache = metadataWith(new Map())) {
+	const fileManager = fileManagerStub();
 	const plugin = {
-		app: { vault, metadataCache },
+		app: { vault, metadataCache, fileManager },
 		registerEvent: vi.fn(),
 	};
 
-	return { plugin, asPlugin: plugin as unknown as Plugin };
+	return { plugin, fileManager, asPlugin: plugin as unknown as Plugin };
 }
 
 async function loadReservedRoot(reservedRoot: unknown): Promise<void> {
@@ -72,6 +92,8 @@ async function loadReservedRoot(reservedRoot: unknown): Promise<void> {
 describe('PaperaVault', () => {
 	beforeEach(async () => {
 		texts.clear();
+		folders.clear();
+		files.clear();
 		await loadReservedRoot(ROOT);
 	});
 
@@ -143,6 +165,196 @@ describe('PaperaVault', () => {
 			await PaperaVault.writeText(pluginWith(vault).asPlugin, INDEX_PATH, '{"version":1}');
 
 			expect(vault.adapter.write).toHaveBeenCalledWith(INDEX_PATH, '{"version":1}');
+		});
+	});
+
+	describe('the folder creation', () => {
+		it('creates a folder that is missing', async () => {
+			const vault = vaultWith(null);
+
+			await PaperaVault.createFolder(pluginWith(vault).asPlugin, 'Papera/Acme');
+
+			expect(vault.createFolder).toHaveBeenCalledWith('Papera/Acme');
+		});
+
+		it('creates nothing when the folder already exists', async () => {
+			const vault = vaultWith(null);
+
+			folders.set('Papera/Acme', folderAt('Papera/Acme'));
+
+			await PaperaVault.createFolder(pluginWith(vault).asPlugin, 'Papera/Acme');
+
+			expect(vault.createFolder).not.toHaveBeenCalled();
+		});
+
+		it('tolerates a folder another writer created first', async () => {
+			const vault = vaultWith(null);
+
+			vault.createFolder.mockRejectedValue(new Error('Folder already exists.'));
+
+			await expect(
+				PaperaVault.createFolder(pluginWith(vault).asPlugin, 'Papera/Acme'),
+			).resolves.toBeUndefined();
+		});
+
+		it('refuses a folder outside the reserved root', async () => {
+			const vault = vaultWith(null);
+
+			await expect(
+				PaperaVault.createFolder(pluginWith(vault).asPlugin, 'Journal/Acme'),
+			).rejects.toBeInstanceOf(PaperaVaultScopeError);
+			expect(vault.createFolder).not.toHaveBeenCalled();
+		});
+	});
+
+	describe('the note write', () => {
+		const contents = {
+			id: 'unit-1',
+			revision: 7,
+			lastChangedAt: '2026-08-30T10:00:00Z',
+			body: 'Body\n',
+		};
+
+		it('creates a note carrying the identity block', async () => {
+			const vault = vaultWith(null);
+
+			await PaperaVault.writeNote(pluginWith(vault).asPlugin, NOTE_PATH, contents);
+
+			expect(vault.create).toHaveBeenCalledWith(
+				NOTE_PATH,
+				'---\npapera_id: unit-1\npapera_rev: 7\nupdated_at: 2026-08-30T10:00:00Z\n---\nBody\n',
+			);
+			expect(vault.process).not.toHaveBeenCalled();
+		});
+
+		it('replaces the whole text of a note that already exists', async () => {
+			const vault = vaultWith(null);
+
+			files.set(NOTE_PATH, fileAt(NOTE_PATH));
+
+			await PaperaVault.writeNote(pluginWith(vault).asPlugin, NOTE_PATH, contents);
+
+			expect(vault.create).not.toHaveBeenCalled();
+			await expect(vault.process.mock.results[0]?.value).resolves.toBe(
+				'---\npapera_id: unit-1\npapera_rev: 7\nupdated_at: 2026-08-30T10:00:00Z\n---\nBody\n',
+			);
+		});
+
+		it('leaves out a revision and a change time it does not know', async () => {
+			const vault = vaultWith(null);
+
+			await PaperaVault.writeNote(pluginWith(vault).asPlugin, NOTE_PATH, {
+				id: 'unit-1',
+				body: 'Body\n',
+			});
+
+			expect(vault.create).toHaveBeenCalledWith(NOTE_PATH, '---\npapera_id: unit-1\n---\nBody\n');
+		});
+
+		it('refuses a note outside the reserved root', async () => {
+			const vault = vaultWith(null);
+
+			await expect(
+				PaperaVault.writeNote(pluginWith(vault).asPlugin, OUTSIDE_PATH, contents),
+			).rejects.toBeInstanceOf(PaperaVaultScopeError);
+			expect(vault.create).not.toHaveBeenCalled();
+		});
+
+		it('marks the path it wrote as its own write', async () => {
+			const vault = vaultWith(null);
+
+			await PaperaVault.writeNote(pluginWith(vault).asPlugin, NOTE_PATH, contents);
+
+			expect(PaperaVault.isSelfWrite(NOTE_PATH)).toBe(true);
+
+			PaperaVault.forgetSelfWrite(NOTE_PATH);
+
+			expect(PaperaVault.isSelfWrite(NOTE_PATH)).toBe(false);
+		});
+	});
+
+	describe('the rename', () => {
+		const MOVED_PATH = 'Papera/Book Club/Drafts/renamed.md';
+
+		it('renames through the Obsidian file manager', async () => {
+			const vault = vaultWith(null);
+			const note = fileAt(NOTE_PATH);
+
+			files.set(NOTE_PATH, note);
+
+			const { fileManager, asPlugin } = pluginWith(vault);
+
+			await PaperaVault.renamePath(asPlugin, NOTE_PATH, MOVED_PATH);
+
+			expect(fileManager.renameFile).toHaveBeenCalledWith(note, MOVED_PATH);
+			expect(vault.create).not.toHaveBeenCalled();
+			expect(vault.process).not.toHaveBeenCalled();
+		});
+
+		it('renames a folder as well as a note', async () => {
+			const vault = vaultWith(null);
+			const folder = folderAt('Papera/Acme');
+
+			folders.set('Papera/Acme', folder);
+
+			const { fileManager, asPlugin } = pluginWith(vault);
+
+			await PaperaVault.renamePath(asPlugin, 'Papera/Acme', 'Papera/Acme Inc');
+
+			expect(fileManager.renameFile).toHaveBeenCalledWith(folder, 'Papera/Acme Inc');
+		});
+
+		it('renames nothing when the path holds no file', async () => {
+			const { fileManager, asPlugin } = pluginWith(vaultWith(null));
+
+			await PaperaVault.renamePath(asPlugin, NOTE_PATH, MOVED_PATH);
+
+			expect(fileManager.renameFile).not.toHaveBeenCalled();
+		});
+
+		it.each([
+			['the source', OUTSIDE_PATH, MOVED_PATH],
+			['the destination', NOTE_PATH, OUTSIDE_PATH],
+		])('refuses a rename whose %s sits outside the reserved root', async (_name, from, to) => {
+			files.set(NOTE_PATH, fileAt(NOTE_PATH));
+
+			const { fileManager, asPlugin } = pluginWith(vaultWith(null));
+
+			await expect(PaperaVault.renamePath(asPlugin, from, to)).rejects.toBeInstanceOf(
+				PaperaVaultScopeError,
+			);
+			expect(fileManager.renameFile).not.toHaveBeenCalled();
+		});
+	});
+
+	describe('the removal', () => {
+		it('removes a note through the trash the person chose', async () => {
+			const note = fileAt(NOTE_PATH);
+
+			files.set(NOTE_PATH, note);
+
+			const { fileManager, asPlugin } = pluginWith(vaultWith(null));
+
+			await PaperaVault.removeNote(asPlugin, NOTE_PATH);
+
+			expect(fileManager.trashFile).toHaveBeenCalledWith(note);
+		});
+
+		it('removes nothing when the note is already gone', async () => {
+			const { fileManager, asPlugin } = pluginWith(vaultWith(null));
+
+			await PaperaVault.removeNote(asPlugin, NOTE_PATH);
+
+			expect(fileManager.trashFile).not.toHaveBeenCalled();
+		});
+
+		it('refuses a note outside the reserved root', async () => {
+			const { fileManager, asPlugin } = pluginWith(vaultWith(null));
+
+			await expect(PaperaVault.removeNote(asPlugin, OUTSIDE_PATH)).rejects.toBeInstanceOf(
+				PaperaVaultScopeError,
+			);
+			expect(fileManager.trashFile).not.toHaveBeenCalled();
 		});
 	});
 

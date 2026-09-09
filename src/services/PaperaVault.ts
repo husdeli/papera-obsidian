@@ -6,6 +6,7 @@ import {
 	getFrontMatterInfo,
 	normalizePath,
 	parseYaml,
+	stringifyYaml,
 } from 'obsidian';
 import { paperaConfig } from '../config/papera.config';
 import { paperaFolderName } from '../domain/paperaFolderName';
@@ -18,8 +19,19 @@ export interface PaperaVaultNote {
 	frontmatter: Record<string, unknown>;
 }
 
+export interface PaperaVaultNoteContents {
+	id: string;
+	revision?: number;
+	lastChangedAt?: string;
+	body: string;
+}
+
 const MARKDOWN_EXTENSION = 'md';
 const EMPTY_PATH = '/';
+const ID_FIELD = 'papera_id';
+const REVISION_FIELD = 'papera_rev';
+const LAST_CHANGED_FIELD = 'updated_at';
+const FRONTMATTER_FENCE = '---\n';
 
 function asRecord(value: unknown): Record<string, unknown> {
 	if (typeof value !== 'object' || value === null || Array.isArray(value)) {
@@ -31,6 +43,7 @@ function asRecord(value: unknown): Record<string, unknown> {
 
 export class PaperaVault {
 	private static owned: string | undefined;
+	private static selfWrites = new Set<string>();
 
 	static load(): string {
 		const sanitized = normalizePath(
@@ -71,6 +84,77 @@ export class PaperaVault {
 		await plugin.app.vault.adapter.write(PaperaVault.scoped(path), contents);
 	}
 
+	static async createFolder(plugin: Plugin, path: string): Promise<void> {
+		const scoped = PaperaVault.scoped(path);
+
+		if (plugin.app.vault.getFolderByPath(scoped) !== null) {
+			return;
+		}
+
+		// A folder another writer created between the check and the call is the answer we wanted.
+		try {
+			await plugin.app.vault.createFolder(scoped);
+		} catch {
+			return;
+		}
+	}
+
+	static async writeNote(
+		plugin: Plugin,
+		path: string,
+		contents: PaperaVaultNoteContents,
+	): Promise<void> {
+		const scoped = PaperaVault.scoped(path);
+		const text = PaperaVault.noteText(contents);
+		const file = plugin.app.vault.getFileByPath(scoped);
+
+		PaperaVault.selfWrites.add(scoped);
+
+		if (file === null) {
+			await plugin.app.vault.create(scoped, text);
+
+			return;
+		}
+
+		await plugin.app.vault.process(file, () => text);
+	}
+
+	static async renamePath(plugin: Plugin, fromPath: string, toPath: string): Promise<void> {
+		const from = PaperaVault.scoped(fromPath);
+		const to = PaperaVault.scoped(toPath);
+		const moved = plugin.app.vault.getAbstractFileByPath(from);
+
+		if (moved === null) {
+			return;
+		}
+
+		PaperaVault.selfWrites.add(from);
+		PaperaVault.selfWrites.add(to);
+
+		await plugin.app.fileManager.renameFile(moved, to);
+	}
+
+	static async removeNote(plugin: Plugin, path: string): Promise<void> {
+		const scoped = PaperaVault.scoped(path);
+		const file = plugin.app.vault.getFileByPath(scoped);
+
+		if (file === null) {
+			return;
+		}
+
+		PaperaVault.selfWrites.add(scoped);
+
+		await plugin.app.fileManager.trashFile(file);
+	}
+
+	static isSelfWrite(path: string): boolean {
+		return PaperaVault.selfWrites.has(normalizePath(path));
+	}
+
+	static forgetSelfWrite(path: string): void {
+		PaperaVault.selfWrites.delete(normalizePath(path));
+	}
+
 	static async markdownNotes(plugin: Plugin): Promise<PaperaVaultNote[]> {
 		const notes: PaperaVaultNote[] = [];
 
@@ -107,6 +191,20 @@ export class PaperaVault {
 				run();
 			}),
 		);
+	}
+
+	private static noteText(contents: PaperaVaultNoteContents): string {
+		const identity: Record<string, unknown> = { [ID_FIELD]: contents.id };
+
+		if (contents.revision !== undefined) {
+			identity[REVISION_FIELD] = contents.revision;
+		}
+
+		if (contents.lastChangedAt !== undefined) {
+			identity[LAST_CHANGED_FIELD] = contents.lastChangedAt;
+		}
+
+		return `${FRONTMATTER_FENCE}${stringifyYaml(identity)}${FRONTMATTER_FENCE}${contents.body}`;
 	}
 
 	private static markdownFiles(plugin: Plugin): TFile[] {

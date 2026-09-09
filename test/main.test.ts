@@ -1,5 +1,6 @@
 import {
 	type App,
+	type Command,
 	type ObsidianProtocolData,
 	type ObsidianProtocolHandler,
 	type PluginManifest,
@@ -8,6 +9,7 @@ import {
 } from 'obsidian';
 import { type Mock, beforeEach, describe, expect, it, vi } from 'vitest';
 import PaperaPlugin from '../src/main';
+import { shownNotices } from './stubs/obsidian';
 import type { PaperaIndex } from '../src/models/paperaIndex';
 import { PaperaVaultIndex } from '../src/services/PaperaVaultIndex';
 import { PaperaVaultMap } from '../src/services/PaperaVaultMap';
@@ -19,6 +21,10 @@ const session = vi.hoisted(() => ({
 }));
 
 vi.mock('../src/services/PaperaSession', () => ({ PaperaSession: session }));
+
+const pull = vi.hoisted(() => ({ run: vi.fn() }));
+
+vi.mock('../src/services/PaperaPull', () => ({ PaperaPull: pull }));
 
 vi.stubGlobal('window', { open: vi.fn(), setTimeout: globalThis.setTimeout.bind(globalThis) });
 
@@ -84,6 +90,7 @@ function newPlugin(stub: ReturnType<typeof appStub>): PaperaPlugin {
 function spiesOf(plugin: PaperaPlugin) {
 	return plugin as unknown as {
 		addSettingTab: Mock;
+		addCommand: Mock<(command: Command) => void>;
 		registerObsidianProtocolHandler: Mock<
 			(action: string, handler: ObsidianProtocolHandler) => void
 		>;
@@ -115,8 +122,16 @@ describe('PaperaPlugin', () => {
 	beforeEach(() => {
 		events.length = 0;
 		forgetVaultState();
+		shownNotices.length = 0;
 		session.completeSignIn.mockReset().mockResolvedValue(undefined);
 		session.accountId.mockReset().mockReturnValue(undefined);
+		pull.run.mockReset().mockResolvedValue({
+			projects: [{ id: 'project-1', name: 'Acme', outcome: 'synced', failedNotes: 0 }],
+			notesWritten: 2,
+			notesRenamed: 0,
+			notesRemoved: 0,
+			unansweredNotes: 0,
+		});
 	});
 
 	it('registers the protocol handler and adds the setting tab', async () => {
@@ -195,6 +210,60 @@ describe('PaperaPlugin', () => {
 			await PaperaVaultMap.ready();
 
 			expect(stub.app.vault.getFolderByPath).toHaveBeenCalledTimes(1);
+		});
+	});
+
+	describe('the sync command', () => {
+		function syncCommand(plugin: PaperaPlugin): Command {
+			const register = spiesOf(plugin).addCommand;
+
+			expect(register).toHaveBeenCalledTimes(1);
+
+			return register.mock.calls[0]?.[0] as Command;
+		}
+
+		it('registers the command in the palette', async () => {
+			const plugin = newPlugin(appStub());
+
+			await plugin.onload();
+
+			expect(syncCommand(plugin)).toMatchObject({ id: 'sync-now', name: 'Sync now' });
+		});
+
+		it('shows what the pull did', async () => {
+			const plugin = newPlugin(appStub());
+
+			await plugin.onload();
+			syncCommand(plugin).callback?.();
+
+			await vi.waitFor(() => {
+				expect(shownNotices).toEqual(['Synced Acme. 2 notes written.']);
+			});
+		});
+
+		it('shows a failure rather than throwing', async () => {
+			const plugin = newPlugin(appStub());
+
+			pull.run.mockRejectedValue(new Error('This vault is not signed in to Papera.'));
+
+			await plugin.onload();
+
+			expect(() => {
+				syncCommand(plugin).callback?.();
+			}).not.toThrow();
+
+			await vi.waitFor(() => {
+				expect(shownNotices).toEqual(['This vault is not signed in to Papera.']);
+			});
+		});
+
+		it('loads the plugin and registers the command while the vault is signed out', async () => {
+			session.isSignedIn.mockReturnValue(false);
+
+			const plugin = newPlugin(appStub());
+
+			await expect(plugin.onload()).resolves.toBeUndefined();
+			expect(syncCommand(plugin)).toBeDefined();
 		});
 	});
 

@@ -1,5 +1,7 @@
 import { Notice, type ObsidianProtocolData, Plugin } from 'obsidian';
 import { paperaConfig } from './config/papera.config';
+import { paperaPullNotice } from './domain/paperaPullNotice';
+import { PaperaPull } from './services/PaperaPull';
 import { PaperaSession } from './services/PaperaSession';
 import { PaperaSettingsStore } from './services/PaperaSettingsStore';
 import { PaperaVault } from './services/PaperaVault';
@@ -14,6 +16,14 @@ export default class PaperaPlugin extends Plugin {
 	async onload(): Promise<void> {
 		this.registerObsidianProtocolHandler(paperaConfig.protocolAction, (params) => {
 			void this.completeSignIn(params);
+		});
+
+		this.addCommand({
+			id: 'sync-now',
+			name: 'Sync now',
+			callback: () => {
+				void this.syncNow();
+			},
 		});
 
 		this.setup = this.startUp();
@@ -67,6 +77,16 @@ export default class PaperaPlugin extends Plugin {
 				}, paperaConfig.mapBuildDelayMs),
 			);
 		});
+	}
+
+	private async syncNow(): Promise<void> {
+		await this.setup;
+
+		try {
+			new Notice(paperaPullNotice.of(await PaperaPull.run(this)));
+		} catch (error) {
+			new Notice(error instanceof Error ? error.message : 'The Papera sync failed.');
+		}
 	}
 
 	private async completeSignIn(params: ObsidianProtocolData): Promise<void> {

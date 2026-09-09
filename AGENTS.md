@@ -33,9 +33,12 @@ a file needs it, and not before.
 - `src/services/PaperaSession.ts` is the only module that holds a Papera token. It refreshes one
   token at a time. It writes no vault file directly, and it records the Papera account through
   `PaperaVaultIndex`.
-- `src/services/PaperaVault.ts` is the only module that names `app.vault`, `app.vault.adapter` or
-  `app.metadataCache`. Every method runs the scope check on its path first, and it returns
-  project-owned shapes, so no caller names `CachedMetadata` or `FrontMatterCache`.
+- `src/services/PaperaVault.ts` is the only module that names `app.vault`, `app.vault.adapter`,
+  `app.metadataCache` or `app.fileManager`. Every method runs the scope check on its path first,
+  and it returns project-owned shapes, so no caller names `CachedMetadata` or `FrontMatterCache`.
+- A note is renamed with `FileManager.renameFile` and removed with `FileManager.trashFile`, never
+  with `Vault.rename` or `Vault.delete`. Obsidian then respells every inbound wikilink itself, and
+  a removed note goes where the person's trash setting sends it.
 - A folder inside the vault is created with `Vault.createFolder`, never `adapter.mkdir`, because
   a folder made through the adapter is missing from the vault's own cache.
 - `src/services/PaperaVaultIndex.ts` is the only module that reads or writes

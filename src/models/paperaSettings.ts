@@ -13,4 +13,6 @@ export interface PaperaSettings {
 	accessTokenExpiresAt?: number;
 	accountId?: string;
 	pendingSignIn?: PaperaPendingSignIn;
+	// An absent list syncs every project the person owns, and an empty list syncs none.
+	syncedProjectIds?: string[];
 }
